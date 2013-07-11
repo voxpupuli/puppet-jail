@@ -1,0 +1,23 @@
+# https://pub.allbsd.org/FreeBSD-snapshots/amd64-amd64/9.1-RELENG_9-r246544-JPSNAP/ftp/
+
+# Use the rc scripts to start and stop jails.  Mount jail's /dev.
+exec.start = "/bin/sh /etc/rc";
+exec.stop = "/bin/sh /etc/rc.shutdown";
+exec.clean;
+mount.devfs;
+
+# Dynamic wildcard parameter:
+# Base the path off the jail name.
+path = "<%= @basedir %>/$name";
+<% if @interface %>
+interface="<%= @interface %>";
+<% end %>
+children.max=10;
+allow.mount;
+allow.mount.devfs;
+allow.mount.zfs;
+allow.raw_sockets;
+allow.socket_af;
+allow.chflags;
+enforce_statfs=1;
+
