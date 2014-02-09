@@ -1,0 +1,7 @@
+
+# Jail: <%= @name %>
+<%= @name %> {
+<% @config.each do |k,v| -%>
+  <%= k -%>=<%= v -%>;
+<% end -%>
+}
