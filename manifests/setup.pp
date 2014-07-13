@@ -11,6 +11,8 @@ class jail::setup (
   $interface = undef
 ) {
 
+  include concat::setup
+
   if $usezfs {
     zfs { "${zpool}/${zfsname}":
       ensure     => present,
