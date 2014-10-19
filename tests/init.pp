@@ -18,6 +18,6 @@ Jail {
   source => '/jails/base.txz',
 }
 
-jail { "/jails/test01": }
-jail { "/jails/test02": }
+jail { '/jails/test01': }
+jail { '/jails/test02': }
 
