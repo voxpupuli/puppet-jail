@@ -6,9 +6,9 @@
 # * Starts the jail if requested
 #
 define jail::zfsjail (
-  $ensure  = present, # running, stopped, absent
-  $config  = {},
   $source,
+  $ensure             = present, # running, stopped, absent
+  $config             = {},
   $bootstrap          = true,
   $bootstrap_template = 'jail/bootstrap.sh.erb',
 ){
@@ -32,10 +32,10 @@ define jail::zfsjail (
     }
 
     jail { $name:
-      ensure      => $ensure,
-      jailbase    => $basedir,
-      source      => $source,
-      require     => [
+      ensure   => $ensure,
+      jailbase => $basedir,
+      source   => $source,
+      require  => [
         Zfs["${pool}/${zfsname}/${name}"],
         Concat::Fragment["jail.conf-${name}"],
       ]
