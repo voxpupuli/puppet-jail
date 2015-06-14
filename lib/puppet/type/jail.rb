@@ -24,20 +24,23 @@ Puppet::Type.newtype(:jail) do
   ensurable do
     desc "what state should the jail be in"
 
-    newvalue(:present, :event => :jail_created) do
+    newvalue(:present) do
       provider.create
     end
 
-    newvalue(:absent, :event => :jail_destroyed) do
+    newvalue(:absent) do
       provider.destroy
     end
 
-    newvalue(:running, :event => :jail_started) do
+    newvalue(:running) do
       provider.start
     end
 
-    newvalue(:stopped, :event => :jail_stopped) do
+    newvalue(:stopped) do
       provider.stop
     end
+
+    aliasvalue(:running, :present)
+    defaultto :present
   end
 end

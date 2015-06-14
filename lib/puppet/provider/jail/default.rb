@@ -1,6 +1,11 @@
 Puppet::Type.type(:jail).provide(:default) do
 
-  confine :kernel    => :freebsd
+  desc "The deafult provider for the jail type.
+
+  Extracts a tarball into the root of a given jail.  Manages stopping,
+  starting, and destruction of a given jail."
+
+  confine    :kernel => :freebsd
   defaultfor :kernel => :freebsd
 
   desc "The jail provider is the only provider for the jail type."
@@ -11,22 +16,54 @@ Puppet::Type.type(:jail).provide(:default) do
   commands :tar     => "/usr/bin/tar"
   commands :chflags => "/bin/chflags"
 
-  def get_jails
-    jaildata = jls(['-h'])
-    debug jaildata.split(/\r?\n/).inspect
+  def self.jail_hash
+    begin
+      output_lines = jls(['-h']).split("\n")
+    rescue => e
+      Puppet.debug "#jail_hash had an error -> #{e.inspect}"
+    end
+
+    headers = output_lines.shift.split
+    data = []
+
+    output_lines.each {|l|
+      line_hash = {}
+      fields = l.split
+      headers.each_with_index {|h,i|
+        line_hash[headers[i]] = fields[i]
+      }
+      data << line_hash
+    }
+    data
+  end
+
+  def self.prefetch(resources)
+    instances.each do |prov|
+      if resource = resources[prov.name]
+        resource.provider = prov
+      end
+    end
+  end
+
+  def self.instances
+    jail_hash.collect do |j|
+      jail_properties = {
+        :ensure => :running,
+        :provider => :default,
+        :name => j['name'],
+        :jailbase => j['path'],
+      }
+      new(jail_properties)
+    end
   end
 
   def exists?
-    get_jails()
-    path = "#{resource[:jailbase]}/#{resource[:name]}/root"
-    debug path.inspect
-    File.directory?(path)
+    path = "#{resource[:jailbase]}/#{resource[:name]}"
+    [:present,:running].include?(@property_hash[:ensure]) or File.directory?(path)
   end
 
   def running?
-    output = jls('-n', 'name').split("\n").find {|j| j =~ /name=#{resource[:name]}/ }
-    debug output.inspect
-    ! output.nil?
+    [:running].include?(@property_hash[:ensure])
   end
 
   def create
@@ -44,8 +81,9 @@ Puppet::Type.type(:jail).provide(:default) do
   end
 
   def start
+    Puppet.debug "What the fuck #{@property_hash}"
     create unless exists?
-    jail(['-c', resource[:name]])
+    jail(['-c', resource[:name]]) unless running?
   end
 
   def stop
