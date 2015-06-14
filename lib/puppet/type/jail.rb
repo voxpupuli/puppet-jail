@@ -29,7 +29,7 @@ Puppet::Type.newtype(:jail) do
     end
 
     newvalue(:absent, :event => :jail_destroyed) do
-      provider.create
+      provider.destroy
     end
 
     newvalue(:running, :event => :jail_started) do
@@ -80,8 +80,9 @@ Puppet::Type.newtype(:jail) do
     end
 
     def destroy
+      jaildir = resource[:jailbase] + '/' + resource[:name]
       stop if running?
-      chflags(['-R', 'noschg', resource[:name]])
+      chflags(['-R', 'noschg', jaildir])
       FileUtils.rm_rf(resource[:name])
     end
 
