@@ -21,27 +21,21 @@ define jail::zfsjail (
   $zfsname = $jail::setup::zfsname
   $basedir = $jail::setup::basedir
 
-  if $ensure == present or $ensure == running {
+  if $ensure == present or $ensure == running or $ensure == stopped {
     concat::fragment { "jail.conf-${name}":
       target  => '/etc/jail.conf',
       content => template('jail/jail.conf-jail.erb'),
+      before  => Jail[$name],
+      notify  => Jail[$name],
     }
 
     zfs { "${pool}/${zfsname}/${name}":
       ensure => present,
-    }
-
-    jail { $name:
-      ensure   => $ensure,
-      jailbase => $basedir,
-      source   => $source,
-      require  => [
-        Zfs["${pool}/${zfsname}/${name}"],
-        Concat::Fragment["jail.conf-${name}"],
-      ]
+      before => Jail[$name],
     }
 
     file { "${basedir}/${name}/etc/resolv.conf":
+      ensure  => 'present',
       owner   => 'root',
       group   => '0',
       mode    => '0644',
@@ -59,5 +53,28 @@ define jail::zfsjail (
         require => Jail[$name],
       }
     }
+    Jail[$name] {
+      require => Concat['/etc/jail.conf']
+    }
+  } elsif $ensure == absent {
+    mount { "${basedir}/${name}/dev":
+      ensure => absent,
+      device => 'devfs',
+      before => Zfs["${pool}/${zfsname}/${name}"],
+    }
+
+    zfs { "${pool}/${zfsname}/${name}":
+      ensure  => absent,
+      require => Jail[$name],
+    }
+    Jail[$name] {
+      before => Concat['/etc/jail.conf']
+    }
+  }
+
+  jail { $name:
+    ensure   => $ensure,
+    jailbase => $basedir,
+    source   => $source,
   }
 }
