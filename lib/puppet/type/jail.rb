@@ -21,6 +21,18 @@ Puppet::Type.newtype(:jail) do
     isrequired
   end
 
+  newparam(:state) do
+    desc "Either running or stopped"
+
+    newvalue(:up) do
+      provider.start
+    end
+
+    newvalue(:down) do
+      provider.stop
+    end
+  end
+
   ensurable do
     desc "what state should the jail be in"
 
@@ -30,14 +42,6 @@ Puppet::Type.newtype(:jail) do
 
     newvalue(:absent) do
       provider.destroy
-    end
-
-    newvalue(:running) do
-      provider.start
-    end
-
-    newvalue(:stopped) do
-      provider.stop
     end
 
     aliasvalue(:running, :present)
