@@ -1,4 +1,4 @@
-Puppet::Type.type(:jail).provide(:default) do
+Puppet::Type.type(:jail).provide(:legacy) do
 
   desc "The deafult provider for the jail type.
 
