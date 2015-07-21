@@ -22,11 +22,11 @@ Puppet::Type.newtype(:jail) do
   newparam(:state) do
     desc "Either running or stopped"
 
-    newvalue(:up) do
+    newvalues(:up) do
       provider.start
     end
 
-    newvalue(:down) do
+    newvalues(:down) do
       provider.stop
     end
   end
@@ -34,11 +34,11 @@ Puppet::Type.newtype(:jail) do
   ensurable do
     desc "what state should the jail be in"
 
-    newvalue(:present) do
+    newvalues(:present) do
       provider.create
     end
 
-    newvalue(:absent) do
+    newvalues(:absent) do
       provider.destroy
     end
 
