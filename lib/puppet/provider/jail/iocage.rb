@@ -1,10 +1,10 @@
 Puppet::Type.type(:jail).provide(:iocage) do
 
-  desc " "
+  desc "Manage jails using iocage(8)"
   confine    :kernel => :freebsd
+  defaultfor :kernel => :freebsd
 
   command :iocage => '/usr/local/sbin/iocage'
-
 
   def self.jail_list
     output = iocage(['list']).split("\n")

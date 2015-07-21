@@ -12,13 +12,11 @@ Puppet::Type.newtype(:jail) do
   end
 
   newparam(:source) do
-    desc "Full path to the local base file"
-    isrequired
+    desc "deprecated: Full path to the local base file"
   end
 
   newparam(:jailbase) do
-    desc "The base directory to build the jail. e.g. /jails"
-    isrequired
+    desc "deprecated: The base directory to build the jail. e.g. /jails"
   end
 
   newparam(:state) do
@@ -47,4 +45,11 @@ Puppet::Type.newtype(:jail) do
     aliasvalue(:running, :present)
     defaultto :present
   end
+
+  jail_params = [
+  ]
+
+  jail_params.each {|p|
+    newparam(p.to_sym)
+  }
 end
