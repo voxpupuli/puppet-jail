@@ -6,6 +6,8 @@ Puppet::Type.type(:jail).provide(:iocage) do
 
   commands :iocage => '/usr/local/sbin/iocage'
 
+  mk_resource_methods
+
   def self.jail_list
     output = iocage(['list']).split("\n")
     fields = output.shift.split().map {|i| i.downcase.to_sym }

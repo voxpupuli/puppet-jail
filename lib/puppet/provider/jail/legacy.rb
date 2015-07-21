@@ -16,6 +16,8 @@ Puppet::Type.type(:jail).provide(:legacy) do
   commands :tar     => "/usr/bin/tar"
   commands :chflags => "/bin/chflags"
 
+  mk_resource_methods
+
   def self.jail_hash
     begin
       output_lines = jls(['-h']).split("\n")
