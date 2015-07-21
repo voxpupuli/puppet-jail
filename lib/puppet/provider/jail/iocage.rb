@@ -36,9 +36,10 @@ Puppet::Type.type(:jail).provide(:iocage) do
     jail_list.collect do |j|
       jail_properties = {
         :ensure => :present,
+        :name => j[:tag],
         :provider => :iocage,
         :state => j[:state],
-        :name => j[:tag],
+        :jid => j[:jid],
       }
       new(jail_properties)
     end

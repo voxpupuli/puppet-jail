@@ -46,6 +46,9 @@ Puppet::Type.newtype(:jail) do
     defaultto :present
   end
 
+
+  newproperty(:jid)
+
   jail_params = [
   ]
 
