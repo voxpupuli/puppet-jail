@@ -47,7 +47,9 @@ Puppet::Type.newtype(:jail) do
   end
 
 
-  newproperty(:jid)
+  newproperty(:jid) do
+    desc "The jail ID for running jails"
+  end
 
   jail_params = [
   ]
