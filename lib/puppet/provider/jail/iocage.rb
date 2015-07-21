@@ -41,8 +41,12 @@ Puppet::Type.type(:jail).provide(:iocage) do
         :name => j[:tag],
         :provider => :iocage,
         :state => j[:state],
-        :jid => j[:jid],
       }
+
+      if j[:jid] != '-'
+        jail_properties[:jid] = j[:jid]
+      end
+
       new(jail_properties)
     end
   end
