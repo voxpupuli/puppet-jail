@@ -37,9 +37,9 @@ Puppet::Type.type(:jail).provide(:iocage) do
   def self.instances
     jail_list.collect do |j|
       jail_properties = {
+        :provider => :iocage,
         :ensure => :present,
         :name => j[:tag],
-        :provider => :iocage,
         :state => j[:state],
       }
 
@@ -51,6 +51,11 @@ Puppet::Type.type(:jail).provide(:iocage) do
     end
   end
 
+  def initialize(value={})
+    super(value)
+    @property_flush = {}
+  end
+
   def exists?
     @property_hash[:ensure] == :present
   end
@@ -60,19 +65,43 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def create
-    iocage(['create', '-c', "tag=#{resource[:name]}"])
+    @property_flush[:ensure] = :present
   end
 
   def destroy
-    iocage(['destroy', '-f', resource[:name]])
+    @property_flush[:ensure] = :absent
   end
 
-  def start
-    iocage(['start', resource[:name]])
+  def state=(value)
+    @property_flush[:state] = value
   end
 
-  def stop
-    iocage(['stop', resource[:name]])
-  end
+  def flush
+    if @property_flush
+      Puppet.debug @property_flush
 
+      if @property_flush[:ensure]
+        case resource[:ensure]
+        when :absent
+          iocage(['stop', resource[:name]])
+          iocage(['destroy', '-f', resource[:name]])
+        when :present
+          iocage(['create', '-c', "tag=#{resource[:name]}"])
+          if resource[:state] == :up
+            iocage(['start', resource[:name]])
+          end
+        end
+      end
+
+      if @property_flush[:state]
+        case resource[:state]
+        when :up
+          iocage(['start', resource[:name]])
+        when :down
+          iocage(['stop', resource[:name]])
+        end
+      end
+    end
+    @property_hash = resource.to_hash
+  end
 end

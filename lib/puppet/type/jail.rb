@@ -19,13 +19,6 @@ Puppet::Type.newtype(:jail) do
 
   newproperty(:state) do
     desc "Either running or stopped"
-
-    newvalues(:up) do
-      provider.start
-    end
-
-    newvalues(:down) do
-      provider.stop
-    end
+    newvalues(:up, :down)
   end
 end
