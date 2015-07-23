@@ -6,7 +6,6 @@ Puppet::Type.type(:jail).provide(:legacy) do
   starting, and destruction of a given jail."
 
   confine    :kernel => :freebsd
-  defaultfor :kernel => :freebsd
 
   desc "The jail provider is the only provider for the jail type."
 
