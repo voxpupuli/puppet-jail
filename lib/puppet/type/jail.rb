@@ -7,27 +7,14 @@
 
 Puppet::Type.newtype(:jail) do
 
+  ensurable
+
   newparam(:name, :namevar => true) do
     desc "The name of the jail, and only the name"
   end
 
   newparam(:jid) do
     desc "The jail ID for running jails"
-  end
-
-
-  ensurable do
-    desc "what state should the jail be in"
-
-    newvalues(:present) do
-      provider.create
-    end
-
-    newvalues(:absent) do
-      provider.destroy
-    end
-
-    defaultto :present
   end
 
   newproperty(:state) do

@@ -56,7 +56,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def running?
-    ['up'].include?(@property_hash[:state])
+    @property_hash[:state] == :up
   end
 
   def create
