@@ -11,25 +11,10 @@ Puppet::Type.newtype(:jail) do
     desc "The name of the jail, and only the name"
   end
 
-  newparam(:source) do
-    desc "deprecated: Full path to the local base file"
+  newparam(:jid) do
+    desc "The jail ID for running jails"
   end
 
-  newparam(:jailbase) do
-    desc "deprecated: The base directory to build the jail. e.g. /jails"
-  end
-
-  newparam(:state) do
-    desc "Either running or stopped"
-
-    newvalues(:up) do
-      provider.start
-    end
-
-    newvalues(:down) do
-      provider.stop
-    end
-  end
 
   ensurable do
     desc "what state should the jail be in"
@@ -46,15 +31,15 @@ Puppet::Type.newtype(:jail) do
     defaultto :present
   end
 
+  newproperty(:state) do
+    desc "Either running or stopped"
 
-  newproperty(:jid) do
-    desc "The jail ID for running jails"
+    newvalues(:up) do
+      provider.start
+    end
+
+    newvalues(:down) do
+      provider.stop
+    end
   end
-
-  jail_params = [
-  ]
-
-  jail_params.each {|p|
-    newparam(p.to_sym)
-  }
 end
