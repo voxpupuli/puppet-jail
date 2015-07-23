@@ -27,7 +27,6 @@ Puppet::Type.newtype(:jail) do
       provider.destroy
     end
 
-    aliasvalue(:running, :present)
     defaultto :present
   end
 
