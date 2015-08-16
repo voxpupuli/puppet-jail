@@ -59,6 +59,8 @@ Puppet::Type.type(:jail).provide(:iocage) do
         jail_properties[p] = all_properties[p]
       }
 
+      debug jail_properties
+
       new(jail_properties)
     end
   end
