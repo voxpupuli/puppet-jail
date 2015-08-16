@@ -35,6 +35,10 @@ Puppet::Type.newtype(:jail) do
     desc "Interface|Address"
   end
 
+  newproperty(:hostname) do
+    desc "Hostname of the jail"
+  end
+
   def refresh
     if @parameters[:state] == :up
       provider.restart

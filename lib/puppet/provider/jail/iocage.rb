@@ -53,6 +53,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
       extra_properties = [
           :ip4_addr,
           :ip6_addr,
+          :hostname,
       ]
 
       extra_properties.each {|p|
@@ -125,6 +126,10 @@ Puppet::Type.type(:jail).provide(:iocage) do
     @property_flush[:ip6_addr] = value
   end
 
+  def hostname=(value)
+    @property_flush[:hostname] = value
+  end
+
   def flush
     if @property_flush
       Puppet.debug @property_flush
@@ -151,7 +156,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
         end
       end
 
-      [:boot,:ip4_addr,:ip6_addr].each {|p|
+      [:boot,:ip4_addr,:ip6_addr,:hostname].each {|p|
         if @property_flush[p]
           set_property(p.to_s, @property_flush[p])
         end
