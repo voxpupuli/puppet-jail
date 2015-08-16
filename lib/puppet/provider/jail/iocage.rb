@@ -73,9 +73,9 @@ Puppet::Type.type(:jail).provide(:iocage) do
   def self.get_jail_properties(jailname)
     data = {}
     output = iocage(['get','all',jailname])
-    output.lines.map {|l| l.chomp }.each {|l|
+    output.lines.each {|l|
       key, value = l.split(':', 2)
-      data[key] = value
+      data[key] = value.chomp
     }
     data.reject! {|k,v| k == nil or v == nil}
 
