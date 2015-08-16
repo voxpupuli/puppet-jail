@@ -147,20 +147,30 @@ Puppet::Type.type(:jail).provide(:iocage) do
         end
       end
 
-      if @property_flush[:state]
-        case resource[:state]
-        when :up
-          iocage(['start', resource[:name]])
-        when :down
-          iocage(['stop', resource[:name]])
-        end
-      end
 
+      need_restart = false
       [:boot,:ip4_addr,:ip6_addr,:hostname].each {|p|
         if @property_flush[p]
+          need_restart = true
           set_property(p.to_s, @property_flush[p])
         end
       }
+
+      if @property_flush[:state]
+        case resource[:state]
+          when :up
+            need_restart = false
+            iocage(['start', resource[:name]])
+          when :down
+            need_restart = false
+            iocage(['stop', resource[:name]])
+        end
+      end
+
+      if need_restart
+        restart
+      end
+
     end
     @property_hash = resource.to_hash
   end
