@@ -56,7 +56,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
       ]
 
       extra_properties.each {|p|
-        jail_properties[p] = all_properties[p]
+        jail_properties[p] = all_properties[p.to_s]
       }
 
       debug jail_properties
@@ -73,7 +73,6 @@ Puppet::Type.type(:jail).provide(:iocage) do
   def self.get_jail_properties(jailname)
     data = {}
     output = iocage(['get','all',jailname])
-    debug output
     output.lines.each {|l|
       key, value = l.split(':', 2)
       data[key] = value.chomp
