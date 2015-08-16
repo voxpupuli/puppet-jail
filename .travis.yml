@@ -10,3 +10,4 @@ script: bundle exec rake test
 env:
   - PUPPET_VERSION="~> 3.6.0" STRICT_VARIABLES=yes
   - PUPPET_VERSION="~> 3.7.0" STRICT_VARIABLES=yes
+sudo: false

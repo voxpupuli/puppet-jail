@@ -1,0 +1,3 @@
+JID   UUID                                  BOOT  STATE  TAG
+1     b604d70f-220f-11e5-ad5f-0025905cf7cd  off   up     mon1
+-     fdfad85f-220c-11e5-ad5f-0025905cf7cd  off   down   fbsd10.1
