@@ -23,6 +23,8 @@ Puppet::Type.type(:jail).provide(:iocage) do
       data << jail_data
     }
 
+    debug data
+
     return data
   end
 
