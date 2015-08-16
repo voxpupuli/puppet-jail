@@ -48,7 +48,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
         jail_properties[:jid] = j[:jid]
       end
 
-      all_properties = self.get_jail_properties(j[:tag])
+      all_properties = get_jail_properties(j[:tag])
 
       extra_properties = [
           :ip4_addr,
