@@ -77,6 +77,8 @@ Puppet::Type.type(:jail).provide(:iocage) do
       key, value = l.split(':', 2)
       data[key] = value
     }
+    data.reject! {|k,v| k == nil or v == nil}
+
     data
   end
 
