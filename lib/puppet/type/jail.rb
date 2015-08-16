@@ -21,4 +21,25 @@ Puppet::Type.newtype(:jail) do
     desc "Either running or stopped"
     newvalues(:up, :down)
   end
+
+  newproperty(:boot) do
+    desc "Either on or off"
+    newvalues(:on, :off)
+  end
+
+  newproperty(:ip4_addr) do
+    desc "Interface|Address"
+  end
+
+  newproperty(:ip6_addr) do
+    desc "Interface|Address"
+  end
+
+  def refresh
+    if @parameters[:state] == :up
+      provider.restart
+    else
+      debug "Skipping restart: jail not running"
+    end
+  end
 end

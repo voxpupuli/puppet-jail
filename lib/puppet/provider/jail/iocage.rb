@@ -41,6 +41,9 @@ Puppet::Type.type(:jail).provide(:iocage) do
         :ensure => :present,
         :name => j[:tag],
         :state => j[:state],
+        :boot => j[:boot],
+        :ip4_addr => j[:ip4_addr],
+        :ip6_addr => j[:ip6_addr],
       }
 
       if j[:jid] != '-'
@@ -50,6 +53,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
       new(jail_properties)
     end
   end
+
 
   def initialize(value={})
     super(value)
@@ -72,8 +76,29 @@ Puppet::Type.type(:jail).provide(:iocage) do
     @property_flush[:ensure] = :absent
   end
 
+  def restart
+    iocage(['stop', resource[:name]])
+    iocage(['start', resource[:name]])
+  end
+
+  def set_property(property, value)
+    iocage(['set', "#{property}=#{value}", resource[:name]])
+  end
+
   def state=(value)
     @property_flush[:state] = value
+  end
+
+  def boot=(value)
+    @property_flush[:boot] = value
+  end
+
+  def ip4_addr=(value)
+    @property_flush[:ip4_addr] = value
+  end
+
+  def ip6_addr=(value)
+    @property_flush[:ip6_addr] = value
   end
 
   def flush
@@ -101,6 +126,12 @@ Puppet::Type.type(:jail).provide(:iocage) do
           iocage(['stop', resource[:name]])
         end
       end
+
+      [:boot,:ip4_addr,:ip6_addr].each {|p|
+        if @property_flush[p]
+          set_property(p.to_s, @property_flush[p])
+        end
+      }
     end
     @property_hash = resource.to_hash
   end
