@@ -7,40 +7,43 @@
 
 Puppet::Type.newtype(:jail) do
 
+  ensurable
+
   newparam(:name, :namevar => true) do
     desc "The name of the jail, and only the name"
   end
 
-  newparam(:source) do
-    desc "Full path to the local base file"
-    isrequired
+  newparam(:jid) do
+    desc "The jail ID for running jails"
   end
 
-  newparam(:jailbase) do
-    desc "The base directory to build the jail. e.g. /jails"
-    isrequired
+  newproperty(:state) do
+    desc "Either running or stopped"
+    newvalues(:up, :down)
   end
 
-  ensurable do
-    desc "what state should the jail be in"
+  newproperty(:boot) do
+    desc "Either on or off"
+    newvalues(:on, :off)
+  end
 
-    newvalue(:present) do
-      provider.create
+  newproperty(:ip4_addr) do
+    desc "Interface|Address"
+  end
+
+  newproperty(:ip6_addr) do
+    desc "Interface|Address"
+  end
+
+  newproperty(:hostname) do
+    desc "Hostname of the jail"
+  end
+
+  def refresh
+    if @parameters[:state] == :up
+      provider.restart
+    else
+      debug "Skipping restart: jail not running"
     end
-
-    newvalue(:absent) do
-      provider.destroy
-    end
-
-    newvalue(:running) do
-      provider.start
-    end
-
-    newvalue(:stopped) do
-      provider.stop
-    end
-
-    aliasvalue(:running, :present)
-    defaultto :present
   end
 end

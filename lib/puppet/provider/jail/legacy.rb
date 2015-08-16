@@ -1,4 +1,4 @@
-Puppet::Type.type(:jail).provide(:default) do
+Puppet::Type.type(:jail).provide(:legacy) do
 
   desc "The deafult provider for the jail type.
 
@@ -6,7 +6,6 @@ Puppet::Type.type(:jail).provide(:default) do
   starting, and destruction of a given jail."
 
   confine    :kernel => :freebsd
-  defaultfor :kernel => :freebsd
 
   desc "The jail provider is the only provider for the jail type."
 
@@ -15,6 +14,8 @@ Puppet::Type.type(:jail).provide(:default) do
   commands :jexec   => "/usr/sbin/jexec"
   commands :tar     => "/usr/bin/tar"
   commands :chflags => "/bin/chflags"
+
+  mk_resource_methods
 
   def self.jail_hash
     begin
