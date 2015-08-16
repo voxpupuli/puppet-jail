@@ -23,8 +23,6 @@ Puppet::Type.type(:jail).provide(:iocage) do
       data << jail_data
     }
 
-    debug data
-
     return data
   end
 
@@ -44,22 +42,40 @@ Puppet::Type.type(:jail).provide(:iocage) do
         :name => j[:tag],
         :state => j[:state],
         :boot => j[:boot],
-        :ip4_addr => j[:ip4_addr],
-        :ip6_addr => j[:ip6_addr],
       }
 
       if j[:jid] != '-'
         jail_properties[:jid] = j[:jid]
       end
 
+      all_properties = self.get_jail_properties(j[:tag])
+
+      extra_properties = [
+          :ip4_addr,
+          :ip6_addr,
+      ]
+
+      extra_properties.each {|p|
+        jail_properties[p] = all_properties[p]
+      }
+
       new(jail_properties)
     end
   end
 
-
   def initialize(value={})
     super(value)
     @property_flush = {}
+  end
+
+  def self.get_jail_properties(jailname)
+    data = {}
+    output = iocage(['get','all',jailname])
+    output.lines.map {|l| l.chomp }.each {|l|
+      key, value = l.split(':', 2)
+      data[key] = value
+    }
+    data
   end
 
   def exists?
