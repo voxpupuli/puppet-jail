@@ -7,6 +7,7 @@
   "source": "git://github.com/xaque208/puppet-jail.git",
   "project_page": "https://github.com/xaque208/puppet-jail",
   "issues_url": "https://github.com/xaque208/puppet-jail/issues",
+  "tags": ["FreeBSD", "jails", "containers", "iocage", "zfs"],
   "operatingsystem_support": [
     {
       "operatingsystem": "FreeBSD",
