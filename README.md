@@ -26,7 +26,7 @@ jail { 'myjail1':
   ip4_addr => 'em0|10.0.0.10/24',
   ip6_addr => 'em0|fc00::10/64',
   hostname => 'myjail1.example.com',
-  boot     => 'yes'
+  boot     => 'on'
 }
 ```
 
