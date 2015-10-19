@@ -18,7 +18,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
       jail_data = {}
       values = j.split()
 
-      iocage_jail_list_regex = /^(-|[1-9]+)\s+([[:xdigit:]]{8}-([[:xdigit:]]{4}-){3})[[:xdigit:]]{12}\s+(on|off)\s+(up|down)\s+\w+$/
+      iocage_jail_list_regex = /^(-|[0-9]+)\s+([[:xdigit:]]{8}-([[:xdigit:]]{4}-){3})[[:xdigit:]]{12}\s+(on|off)\s+(up|down)\s+\w+$/
       next if iocage_jail_list_regex.match(j) == nil
 
       values.each_index {|i|
