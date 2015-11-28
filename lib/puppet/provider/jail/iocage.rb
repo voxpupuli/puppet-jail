@@ -136,7 +136,14 @@ Puppet::Type.type(:jail).provide(:iocage) do
 
   def flush
     if @property_flush
-      Puppet.debug @property_flush
+      Puppet.debug "JailIocage(#flush): #{@property_flush}"
+
+      pre_start_properties = [
+          :boot,
+          :ip4_addr,
+          :ip6_addr,
+          :hostname,
+      ]
 
       if @property_flush[:ensure]
         case resource[:ensure]
@@ -146,14 +153,18 @@ Puppet::Type.type(:jail).provide(:iocage) do
         when :present
           iocage(['create', '-c', "tag=#{resource[:name]}"])
           if resource[:state] == :up
+            pre_start_properties.each {|p|
+              if resource[p]
+                set_property(p.to_s, resource[p])
+              end
+            }
             iocage(['start', resource[:name]])
           end
         end
       end
 
-
       need_restart = false
-      [:boot,:ip4_addr,:ip6_addr,:hostname].each {|p|
+      pre_start_properties.each {|p|
         if @property_flush[p]
           need_restart = true
           set_property(p.to_s, @property_flush[p])
@@ -174,7 +185,6 @@ Puppet::Type.type(:jail).provide(:iocage) do
       if need_restart
         restart
       end
-
     end
     @property_hash = resource.to_hash
   end
