@@ -1,6 +1,6 @@
 {
   "name": "zleslie-jail",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "author": "zleslie",
   "summary": "Jail management with Puppet",
   "license": "Apache-2.0",
