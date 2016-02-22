@@ -7,6 +7,7 @@ JID   UUID                                  BOOT  STATE  TAG
 333   ca29dc76-46f6-11e5-9073-0025905cf7cc  on    up     pdb2
 -     e2f5f461-4314-11e5-94bc-0025905cf7cc  off   down   mon1
 10    e2f5f462-4314-11e5-94bc-0025905cf7cc  off   down   mon2
+-     fdd4151c-d555-11e5-b08a-0025906cac26  off   down   741ac3b9-7c44-4400-8916-4ee6037d94bd
 --- non iocage jails currently active ---
 JID   PATH                                  IP4              HOSTNAME 
 4     /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default
