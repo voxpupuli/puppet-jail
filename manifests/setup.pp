@@ -7,7 +7,6 @@ class jail::setup () {
 
   package { 'iocage': ensure => installed; }
   service { 'iocage':
-    ensure => 'running',
     enable => true,
   }
 
