@@ -1,6 +1,6 @@
 # FreeBSD Jail management with Puppet
 
-[![Build Status](https://travis-ci.org/xaque208/puppet-jail.svg?branch=master)](https://travis-ci.org/xaque208/puppet-jail)
+[![Puppet Forge](https://img.shields.io/puppetforge/v/zleslie/jail.svg)]() [![Build Status](https://travis-ci.org/xaque208/puppet-jail.svg?branch=master)](https://travis-ci.org/xaque208/puppet-jail)
 
 Manage FreeBSD jails with Puppet, leveraging [iocage] for jail management.
 
