@@ -17,6 +17,6 @@ class jail::setup () {
     ensure => absent;
   }
 
-  File['/etc/jail.conf'] ~> Service['iocage'];
-  Package['iocage'] ~> Service['iocage'];
+  File['/etc/jail.conf'] ~> Service['iocage']
+  Package['iocage'] ~> Service['iocage']
 }
