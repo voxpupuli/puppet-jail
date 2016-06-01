@@ -1,5 +1,12 @@
 ## Unreleased
- - Add user_data support for first boot shell
+ - 
+
+## 2016-04-25 2.1.0
+#### Summary
+A feature release.
+
+#### Features
+ - Add user_data support for first boot script
 
 ## 2016-04-25 2.0.9
 ### Summary
