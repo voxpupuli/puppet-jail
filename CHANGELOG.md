@@ -1,7 +1,15 @@
 ## Unreleased
  - 
 
-## 2016-04-25 2.1.0
+## 2016-05-31 2.1.1
+#### Summary
+Changes to testing dependencies.
+
+#### Testing
+ - Drop guard from the Gemfile
+
+A feature release.
+## 2016-05-31 2.1.0
 #### Summary
 A feature release.
 
