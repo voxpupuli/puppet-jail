@@ -1,3 +1,5 @@
+require 'tempfile'
+
 Puppet::Type.type(:jail).provide(:iocage) do
 
   desc "Manage jails using iocage(8)"
@@ -159,6 +161,15 @@ Puppet::Type.type(:jail).provide(:iocage) do
               end
             }
             iocage(['start', resource[:name]])
+            if resource[:user_data]
+              tmpfile = Tempfile.new('puppet-iocage')
+              tmpfile.write(resource[:user_data])
+              tmpfile.close
+              execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh",
+                { :stdinfile => tmpfile.path }
+              )
+              tmpfile.delete
+            end
           end
         end
       end

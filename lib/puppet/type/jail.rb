@@ -17,6 +17,10 @@ Puppet::Type.newtype(:jail) do
     desc "The jail ID for running jails"
   end
 
+  newparam(:user_data) do
+    desc "Rendered content to pipe to a jailed shell upon creation"
+  end
+
   newproperty(:state) do
     desc "Either running or stopped"
     newvalues(:up, :down)

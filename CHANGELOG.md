@@ -1,4 +1,5 @@
 ## Unreleased
+ - Add user_data support for first boot shell
 
 ## 2016-04-25 2.0.9
 ### Summary

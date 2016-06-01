@@ -21,16 +21,17 @@ specify the pool on each jail.
 
 ```Puppet
 jail { 'myjail1':
-  ensure   => present,
-  state    => 'up',
-  ip4_addr => 'em0|10.0.0.10/24',
-  ip6_addr => 'em0|fc00::10/64',
-  hostname => 'myjail1.example.com',
-  boot     => 'on'
+  ensure    => present,
+  state     => 'up',
+  ip4_addr  => 'em0|10.0.0.10/24',
+  ip6_addr  => 'em0|fc00::10/64',
+  hostname  => 'myjail1.example.com',
+  boot      => 'on',
+  user_data => template('mysite/user_data.sh.erb'),
 }
 ```
 
-Note the `ip4_addr` and the `ip6_addr` properties take an interface name and an IP address seperated by a pipe character.  This value is passed directly to `iocage(8)`.  You may wish to read the man page.
+Note the `ip4_addr` and the `ip6_addr` properties take an interface name and an IP address separated by a pipe character.  This value is passed directly to `iocage(7)`.  You may wish to read the man page.
 
 [iocage]: http://iocage.readthedocs.org/en/latest/
 
