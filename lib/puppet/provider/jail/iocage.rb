@@ -43,11 +43,11 @@ Puppet::Type.type(:jail).provide(:iocage) do
   def self.instances
     jail_list.collect do |j|
       jail_properties = {
-        :provider => :iocage,
-        :ensure => :present,
-        :name => j[:tag],
-        :state => j[:state],
-        :boot => j[:boot],
+        :provider         => :iocage,
+        :ensure           => :present,
+        :name             => j[:tag],
+        :state            => j[:state],
+        :boot             => j[:boot],
       }
 
       if j[:jid] != '-'
@@ -60,6 +60,8 @@ Puppet::Type.type(:jail).provide(:iocage) do
           :ip4_addr,
           :ip6_addr,
           :hostname,
+          :jail_zfs,
+          :jail_zfs_dataset,
       ]
 
       extra_properties.each {|p|
@@ -136,6 +138,14 @@ Puppet::Type.type(:jail).provide(:iocage) do
     @property_flush[:hostname] = value
   end
 
+  def jail_zfs=(value)
+    @property_flush[:jail_zfs] = value
+  end
+
+  def jail_zfs_dataset=(value)
+    @property_flush[:jail_zfs_dataset] = value
+  end
+
   def flush
     if @property_flush
       Puppet.debug "JailIocage(#flush): #{@property_flush}"
@@ -145,6 +155,8 @@ Puppet::Type.type(:jail).provide(:iocage) do
           :ip4_addr,
           :ip6_addr,
           :hostname,
+          :jail_zfs,
+          :jail_zfs_dataset,
       ]
 
       if @property_flush[:ensure]

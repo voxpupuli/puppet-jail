@@ -43,6 +43,20 @@ Puppet::Type.newtype(:jail) do
     desc "Hostname of the jail"
   end
 
+  newproperty(:jail_zfs) do
+    desc "Enable the jail_zfs"
+    newvalues(:on, :off)
+  end
+
+  newproperty(:jail_zfs_dataset) do
+    desc "Set the jail_zfs_data set iocage parameter"
+    validate do |value|
+      unless value.is_a? String
+        raise ArgumentError, "jail_zfs_dataset requires string value"
+      end
+    end
+  end
+
   def refresh
     if @parameters[:state] == :up
       provider.restart
