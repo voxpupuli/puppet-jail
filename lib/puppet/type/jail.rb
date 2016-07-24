@@ -1,8 +1,8 @@
-# This type is meant to facilitate teh deployment of FreeBSD jails.
+# This type is meant to facilitate the deployment of FreeBSD jails.
 #
 # We make assumptions.
 #
-# 1. The directorie that you are attemtping to deploy a jail to, actually exists.
+# 1. The directories that you are attempting to deploy a jail to, actually exists.
 #
 
 Puppet::Type.newtype(:jail) do
