@@ -1,5 +1,6 @@
 ## Unreleased
- - 
+ - Add ZFS properties
+ - Drop legacy jail provider
 
 ## 2016-05-31 2.1.1
 #### Summary
