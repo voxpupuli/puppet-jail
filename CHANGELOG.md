@@ -1,4 +1,10 @@
 ## Unreleased
+
+## 2016-07-27 3.0.0
+#### Summary
+Drop legacy code and add new zfs properties.
+
+## Features
  - Add ZFS properties
  - Drop legacy jail provider
 
