@@ -8,7 +8,7 @@ ip4_autoend:none
 ip4_autosubnet:none
 ip4_saddrsel:1
 ip4:new
-ip6_addr:ethernet0|2001:470:deed::100/64
+ip6_addr:ethernet0|2001:470:deed::100
 ip6_saddrsel:1
 ip6:new
 defaultrouter:none

@@ -31,6 +31,8 @@ describe provider_class do
       results.should(include('boot' => 'on'))
       results.should(include('jail_zfs' => 'on'))
       results.should(include('jail_zfs_dataset' => 'media_in'))
+      results.should(include('ip4_addr' => 'ethernet0|10.0.0.10'))
+      results.should(include('ip6_addr' => 'ethernet0|2001:470:deed::100'))
     end
 
   end
