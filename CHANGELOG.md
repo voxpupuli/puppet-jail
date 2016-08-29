@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 2016-08-29 3.1.0
+#### Summary
+Drop old puppet versions, add tests for existing functionality.
+
 ## 2016-07-27 3.0.0
 #### Summary
 Drop legacy code and add new zfs properties.
