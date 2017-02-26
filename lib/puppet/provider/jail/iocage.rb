@@ -1,72 +1,69 @@
 require 'tempfile'
 
 Puppet::Type.type(:jail).provide(:iocage) do
+  desc 'Manage jails using iocage(8)'
+  confine    kernel: :freebsd
+  defaultfor kernel: :freebsd
 
-  desc "Manage jails using iocage(8)"
-  confine    :kernel => :freebsd
-  defaultfor :kernel => :freebsd
-
-  commands :iocage => '/usr/local/sbin/iocage'
+  commands iocage: '/usr/local/sbin/iocage'
 
   mk_resource_methods
 
   def self.jail_list
     output = iocage(['list']).split("\n")
-    fields = output.shift.split().map {|i| i.downcase.to_sym }
+    fields = output.shift.split.map { |i| i.downcase.to_sym }
 
     data = []
 
-    output.each {|j|
+    output.each do |j|
       jail_data = {}
-      values = j.split()
+      values = j.split
 
-      iocage_jail_list_regex = /^(-|[0-9]+)\s+([[:xdigit:]]{8}-([[:xdigit:]]{4}-){3})[[:xdigit:]]{12}\s+(on|off)\s+(up|down)\s+.+$/
-      next if iocage_jail_list_regex.match(j) == nil
+      iocage_jail_list_regex = %r{^(-|[0-9]+)\s+([[:xdigit:]]{8}-([[:xdigit:]]{4}-){3})[[:xdigit:]]{12}\s+(on|off)\s+(up|down)\s+.+$}
+      next if iocage_jail_list_regex.match(j).nil?
 
-      values.each_index {|i|
+      values.each_index do |i|
         jail_data[fields[i]] = values[i]
-      }
+      end
       data << jail_data
-    }
+    end
 
-    return data
+    data
   end
 
   def self.prefetch(resources)
     instances.each do |prov|
-      if resource = resources[prov.name]
+      if (resource = resources[prov.name])
         resource.provider = prov
       end
     end
   end
 
   def self.instances
-    jail_list.collect do |j|
+    jail_list.map do |j|
       jail_properties = {
-        :provider         => :iocage,
-        :ensure           => :present,
-        :name             => j[:tag],
-        :state            => j[:state],
-        :boot             => j[:boot],
+        provider: :iocage,
+        ensure: :present,
+        name: j[:tag],
+        state: j[:state],
+        boot: j[:boot]
       }
 
-      if j[:jid] != '-'
-        jail_properties[:jid] = j[:jid]
-      end
+      jail_properties[:jid] = j[:jid] if j[:jid] != '-'
 
       all_properties = get_jail_properties(j[:tag])
 
       extra_properties = [
-          :ip4_addr,
-          :ip6_addr,
-          :hostname,
-          :jail_zfs,
-          :jail_zfs_dataset,
+        :ip4_addr,
+        :ip6_addr,
+        :hostname,
+        :jail_zfs,
+        :jail_zfs_dataset
       ]
 
-      extra_properties.each {|p|
+      extra_properties.each do |p|
         jail_properties[p] = all_properties[p.to_s]
-      }
+      end
 
       debug jail_properties
 
@@ -74,19 +71,19 @@ Puppet::Type.type(:jail).provide(:iocage) do
     end
   end
 
-  def initialize(value={})
+  def initialize(value = {})
     super(value)
     @property_flush = {}
   end
 
   def self.get_jail_properties(jailname)
     data = {}
-    output = iocage(['get','all',jailname])
-    output.lines.each {|l|
+    output = iocage(['get', 'all', jailname])
+    output.lines.each do |l|
       key, value = l.split(':', 2)
       data[key] = value.chomp
-    }
-    data.reject! {|k,v| k == nil or v == nil}
+    end
+    data.reject! { |k, v| k.nil? || v.nil? }
 
     debug data
 
@@ -151,63 +148,57 @@ Puppet::Type.type(:jail).provide(:iocage) do
       Puppet.debug "JailIocage(#flush): #{@property_flush}"
 
       pre_start_properties = [
-          :boot,
-          :ip4_addr,
-          :ip6_addr,
-          :hostname,
-          :jail_zfs,
-          :jail_zfs_dataset,
+        :boot,
+        :ip4_addr,
+        :ip6_addr,
+        :hostname,
+        :jail_zfs,
+        :jail_zfs_dataset
       ]
 
-      if @property_flush[:ensure]
-        case resource[:ensure]
-        when :absent
-          iocage(['stop', resource[:name]])
-          iocage(['destroy', '-f', resource[:name]])
-        when :present
-          iocage(['create', '-c', "tag=#{resource[:name]}"])
-          if resource[:state] == :up
-            pre_start_properties.each {|p|
-              if resource[p]
-                set_property(p.to_s, resource[p])
-              end
-            }
-            iocage(['start', resource[:name]])
-            if resource[:user_data]
-              tmpfile = Tempfile.new('puppet-iocage')
-              tmpfile.write(resource[:user_data])
-              tmpfile.close
-              execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh",
-                { :stdinfile => tmpfile.path }
-              )
-              tmpfile.delete
-            end
-          end
+      case resource[:ensure]
+      when :absent
+        iocage(['stop', resource[:name]])
+        iocage(['destroy', '-f', resource[:name]])
+      when :present
+        iocage(['create', '-c', "tag=#{resource[:name]}"])
+      end
+
+      if resource[:state] == :up && resource[:ensure] == :present
+        pre_start_properties.each do |p|
+          set_property(p.to_s, resource[p]) if resource[p]
+        end
+        iocage(['start', resource[:name]])
+        if resource[:user_data]
+          tmpfile = Tempfile.new('puppet-iocage')
+          tmpfile.write(resource[:user_data])
+          tmpfile.close
+          execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh",
+                  stdinfile: tmpfile.path)
+          tmpfile.delete
         end
       end
 
       need_restart = false
-      pre_start_properties.each {|p|
+      pre_start_properties.each do |p|
         if @property_flush[p]
           need_restart = true
           set_property(p.to_s, @property_flush[p])
         end
-      }
+      end
 
       if @property_flush[:state]
         case resource[:state]
-          when :up
-            need_restart = false
-            iocage(['start', resource[:name]])
-          when :down
-            need_restart = false
-            iocage(['stop', resource[:name]])
+        when :up
+          need_restart = false
+          iocage(['start', resource[:name]])
+        when :down
+          need_restart = false
+          iocage(['stop', resource[:name]])
         end
       end
 
-      if need_restart
-        restart
-      end
+      restart if need_restart
     end
     @property_hash = resource.to_hash
   end
