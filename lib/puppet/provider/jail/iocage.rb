@@ -112,40 +112,15 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def set_property(property, value)
+    return unless @property_hash[property.to_sym] == value
     iocage(['set', "#{property}=#{value}", resource[:name]])
   end
 
-  def state=(value)
-    @property_flush[:state] = value
-  end
-
-  def boot=(value)
-    @property_flush[:boot] = value
-  end
-
-  def ip4_addr=(value)
-    @property_flush[:ip4_addr] = value
-  end
-
-  def ip6_addr=(value)
-    @property_flush[:ip6_addr] = value
-  end
-
-  def hostname=(value)
-    @property_flush[:hostname] = value
-  end
-
-  def jail_zfs=(value)
-    @property_flush[:jail_zfs] = value
-  end
-
-  def jail_zfs_dataset=(value)
-    @property_flush[:jail_zfs_dataset] = value
-  end
-
   def flush
-    if @property_flush
-      Puppet.debug "JailIocage(#flush): #{@property_flush}"
+    require 'pp'
+
+    if @property_hash
+      Puppet.debug "JailIocage(#flush): #{@property_hash}"
 
       pre_start_properties = [
         :boot,
@@ -156,46 +131,57 @@ Puppet::Type.type(:jail).provide(:iocage) do
         :jail_zfs_dataset
       ]
 
-      case resource[:ensure]
-      when :absent
-        iocage(['stop', resource[:name]])
-        iocage(['destroy', '-f', resource[:name]])
-      when :present
-        iocage(['create', '-c', "tag=#{resource[:name]}"])
-      end
-
-      if resource[:state] == :up && resource[:ensure] == :present
-        pre_start_properties.each do |p|
-          set_property(p.to_s, resource[p]) if resource[p]
-        end
-        iocage(['start', resource[:name]])
-        if resource[:user_data]
-          tmpfile = Tempfile.new('puppet-iocage')
-          tmpfile.write(resource[:user_data])
-          tmpfile.close
-          execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh",
-                  stdinfile: tmpfile.path)
-          tmpfile.delete
-        end
-      end
-
       need_restart = false
-      pre_start_properties.each do |p|
-        if @property_flush[p]
-          need_restart = true
-          set_property(p.to_s, @property_flush[p])
-        end
-      end
 
-      if @property_flush[:state]
-        case resource[:state]
-        when :up
-          need_restart = false
-          iocage(['start', resource[:name]])
-        when :down
-          need_restart = false
-          iocage(['stop', resource[:name]])
+      if resource[:ensure] == :present
+
+        # Create the jail if necessary
+        unless @property_hash[:ensure] == :present
+          iocage(['create', '-c', "tag=#{resource[:name]}"])
+          just_created = true
+        else
+          just_created = false
         end
+
+        # Set the desired properties
+        pre_start_properties.each do |p|
+          if resource[p]
+            set_property(p.to_s, resource[p])
+
+            # If the jail is already up, then we should restart it after the
+            # properties have been set
+            if @property_hash[:state] == 'up'
+              if @property_hash[p] != resource[p]
+              need_restart = true
+              end
+            end
+          end
+
+        end
+
+        case resource[:state]
+        when 'up'
+          unless @property_hash[:state] == 'up'
+            iocage(['start', resource[:name]])
+          end
+
+          if resource[:user_data] and just_created
+            tmpfile = Tempfile.new('puppet-iocage')
+            tmpfile.write(resource[:user_data])
+            tmpfile.close
+            execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh",
+                    stdinfile: tmpfile.path)
+            tmpfile.delete
+          end
+        when 'down'
+          unless @property_hash[:state] == 'down'
+            iocage(['stop', resource[:name]])
+          end
+        end
+
+      elsif resource[:ensure] == :absent
+        iocage(['stop', resource[:name]]) unless @property_hash[:state] == 'down'
+        iocage(['destroy', '-f', resource[:name]])
       end
 
       restart if need_restart

@@ -4,6 +4,59 @@ require 'puppet/provider/jail/iocage'
 provider_class = Puppet::Type.type(:jail).provider(:iocage)
 
 describe provider_class do
+
+  ensures = [:present, :absent]
+  states = ['down', 'up']
+  # boots = ['on', 'off']
+
+  ensures.each do |e|
+    before do
+    end
+
+    context "ensure #{e}" do
+      states.each do |s|
+        context "state #{s}" do
+
+          it do
+            fixture = File.read('spec/fixtures/single_list_up')
+            get_fixture = File.read('spec/fixtures/single_get_all_up')
+            expect(provider_class).to receive(:iocage).with(['get', 'all', 'metrics2']) { get_fixture }
+            expect(provider_class).to receive(:iocage).with(['list']) { fixture }
+
+            case e
+            when :present
+              case s
+              when 'up'
+                expect(provider_class).to_not receive(:iocage).with(['stop', 'metrics2'])
+                expect(provider_class).to_not receive(:iocage).with(['start', 'metrics2'])
+                expect(provider_class).to_not receive(:iocage).with(/destroy.*metrics2/)
+                expect(provider_class).to_not receive(:iocage).with(/create.*metrics2/)
+              when 'down'
+                expect(provider_class).to receive(:iocage).with(['stop', 'metrics2'])
+              end
+            when :absent
+              expect(provider_class).to receive(:iocage).with(['stop', 'metrics2'])
+              expect(provider_class).to receive(:iocage).with(['destroy', '-f', 'metrics2'])
+            end
+
+            resource_hash = {
+              name: 'metrics2',
+              state: s,
+              ensure: e,
+            }
+
+            resource = provider_class.new(resource_hash)
+            data = provider_class.prefetch({'jail1' => resource})
+            instance = data[0]
+            instance.resource = resource_hash
+            instance.flush
+          end
+
+        end
+      end
+    end
+  end
+
   context '#jail_list' do
     it 'parses jail listing' do
       fixture = File.read('spec/fixtures/iocage_list')
