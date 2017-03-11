@@ -98,13 +98,13 @@ Puppet::Type.type(:jail).provide(:iocage) do
     @property_hash[:state] == :up
   end
 
-  #def create
-  #  @property_flush[:ensure] = :present
-  #end
+  def create
+    @property_flush[:ensure] = :present
+  end
 
-  #def destroy
-  #  @property_flush[:ensure] = :absent
-  #end
+  def destroy
+    @property_flush[:ensure] = :absent
+  end
 
   def restart
     iocage(['stop', resource[:name]])
