@@ -133,9 +133,6 @@ Puppet::Type.type(:jail).provide(:iocage) do
 
       need_restart = false
 
-      require 'pp'
-      pp @property_hash
-
       if resource[:ensure] == :present
 
         # Create the jail if necessary
