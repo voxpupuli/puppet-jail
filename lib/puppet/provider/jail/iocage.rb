@@ -5,7 +5,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
   confine    kernel: :freebsd
   defaultfor kernel: :freebsd
 
-  commands iocage: '/usr/local/sbin/iocage'
+  commands iocage: 'iocage'
 
   mk_resource_methods
 
@@ -173,7 +173,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
           tmpfile = Tempfile.new('puppet-iocage')
           tmpfile.write(resource[:user_data])
           tmpfile.close
-          execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh",
+          execute("iocage exec #{resource[:name]} /bin/sh",
                   stdinfile: tmpfile.path)
           tmpfile.delete
         end
