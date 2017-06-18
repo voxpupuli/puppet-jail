@@ -9,8 +9,8 @@ Puppet::Type.type(:jail).provide(:iocage) do
 
   mk_resource_methods
 
-  def self.jail_list
-    output = iocage(['list']).split("\n")
+  def self.jail_list(*args)
+    output = iocage(['list', args].flatten).split("\n")
     fields = output.shift.split.map { |i| i.downcase.to_sym }
 
     data = []
@@ -40,18 +40,20 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def self.instances
-    jail_list.map do |j|
+    [jail_list, jail_list('-t')].each.map do |j|
+      all_properties = get_jail_properties(j[:tag])
+
+      jensure = all_properties['template'] == 'yes' ? :template : :present
+
       jail_properties = {
         provider: :iocage,
-        ensure: :present,
+        ensure: jensure,
         name: j[:tag],
         state: j[:state],
         boot: j[:boot]
       }
 
       jail_properties[:jid] = j[:jid] if j[:jid] != '-'
-
-      all_properties = get_jail_properties(j[:tag])
 
       extra_properties = [
         :ip4_addr,
@@ -91,7 +93,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def exists?
-    @property_hash[:ensure] == :present
+    @property_hash[:ensure] == :present || @property_hash[:ensure] == :template
   end
 
   def running?
@@ -162,6 +164,9 @@ Puppet::Type.type(:jail).provide(:iocage) do
         iocage(['destroy', '-f', resource[:name]])
       when :present
         iocage(['create', '-c', "tag=#{resource[:name]}"])
+      when :template
+        iocage(['create', '-c', "tag=#{resource[:name]}"])
+        set_property('template', 'yes')
       end
 
       if resource[:state] == :up && resource[:ensure] == :present

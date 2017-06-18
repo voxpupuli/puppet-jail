@@ -10,6 +10,11 @@ Puppet::Type.newtype(:jail) do
 
   newparam(:name, namevar: true) do
     desc 'The name of the jail, and only the name'
+    newvalues(:present, :absent, :template)
+  end
+
+  newproperty(:ensure) do
+    desc 'Ensure jail present, absent, or template'
   end
 
   newparam(:jid) do
