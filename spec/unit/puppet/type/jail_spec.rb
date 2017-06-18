@@ -4,7 +4,7 @@ require 'puppet/type/jail'
 type_class = Puppet::Type.type(:jail)
 
 describe type_class do
-  [:absent, :present].each do |v|
+  [:absent, :present, :template].each do |v|
     it "should support #{v} as a value to :ensure" do
       j = type_class.new(name: 'myjail', ensure: v)
       expect(j.should(:ensure)).to eq(v)
