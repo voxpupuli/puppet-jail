@@ -14,22 +14,28 @@ describe provider_class do
     end
   end
 
-  context '#get_jail_properties' do
+  context '#jail_list-t' do
+    it 'parses jail listing' do
+      fixture = File.read('spec/fixtures/iocage_list-t')
+      allow(provider_class).to receive(:iocage).with(['list']) { fixture }
+      wanted = [{ jid: '-', uuid: 'b439bd7a-5376-11e7-ad91-d979c2a3eb55', boot: 'off', state: 'down', tag: 'f11-puppet4' }]
+      expect(provider_class.jail_list).to eq(wanted)
+    end
+  end
+
+  context '#get_jail_properties-t' do
     it 'parses jail properties' do
-      list_fixture = File.read('spec/fixtures/iocage_list')
+      list_fixture = File.read('spec/fixtures/iocage_list-t')
       allow(provider_class).to receive(:iocage).with(['list']) { list_fixture }
 
-      get_fixture = File.read('spec/fixtures/iocage_jail_get_all')
-      allow(provider_class).to receive(:iocage).with(['get', 'all', 'f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21']) { get_fixture }
+      get_fixture = File.read('spec/fixtures/iocage_jail_get_all-t')
+      allow(provider_class).to receive(:iocage).with(['get', 'all', 'b439bd7a-5376-11e7-ad91-d979c2a3eb55']) { get_fixture }
 
-      results = provider_class.get_jail_properties('f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21')
+      results = provider_class.get_jail_properties('b439bd7a-5376-11e7-ad91-d979c2a3eb55')
 
-      results.should(include('tag' => 'media2'))
-      results.should(include('boot' => 'on'))
-      results.should(include('jail_zfs' => 'on'))
-      results.should(include('jail_zfs_dataset' => 'media_in'))
-      results.should(include('ip4_addr' => 'ethernet0|10.0.0.10'))
-      results.should(include('ip6_addr' => 'ethernet0|2001:470:deed::100'))
+      results.should(include('tag' => 'f11-puppet4'))
+      results.should(include('boot' => 'off'))
+      results.should(include('template' => 'yes'))
     end
   end
 end

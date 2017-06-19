@@ -101,7 +101,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def create
-    @property_flush[:ensure] = :present
+    @property_flush[:ensure] = resource[:ensure]
   end
 
   def destroy
