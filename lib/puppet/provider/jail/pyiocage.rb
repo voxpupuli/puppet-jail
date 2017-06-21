@@ -15,22 +15,22 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
     # Strip the leading and trailing pipe character from the lines to avoid
     # splitting the pipe thats in the interface/address specification.
-    output.map! {|i| i.gsub(/^\|/, '') }
-    output.map! {|i| i.gsub(/\|$/, '') }
+    output.map! { |i| i.gsub(%r{^\|}, '') }
+    output.map! { |i| i.gsub(%r{\|$}, '') }
 
-    fields = output.shift.split(' | ').map { |i|
+    fields = output.shift.split(' | ').map do |i|
       next if i.empty?
       i.downcase.strip.rstrip.to_sym
-    }.compact
+    end.compact
 
     data = []
 
     output.each do |j|
       jail_data = {}
-      values = j.split(' | ').map {|i|
+      values = j.split(' | ').map do |i|
         next if i.empty?
         i.strip.rstrip
-      }.compact
+      end.compact
 
       iocage_jail_list_regex = %r{^\s+}
       next if iocage_jail_list_regex.match(j).nil?
