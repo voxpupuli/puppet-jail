@@ -116,12 +116,12 @@ describe provider_class do
 
       results = provider_class.get_jail_properties('f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21')
 
-      results.should(include('tag' => 'media2'))
-      results.should(include('boot' => 'on'))
-      results.should(include('jail_zfs' => 'on'))
-      results.should(include('jail_zfs_dataset' => 'media_in'))
-      results.should(include('ip4_addr' => 'ethernet0|10.0.0.10'))
-      results.should(include('ip6_addr' => 'ethernet0|2001:470:deed::100'))
+      expect(results).to(include('tag' => 'media2'))
+      expect(results).to(include('boot' => 'on'))
+      expect(results).to(include('jail_zfs' => 'on'))
+      expect(results).to(include('jail_zfs_dataset' => 'media_in'))
+      expect(results).to(include('ip4_addr' => 'ethernet0|10.0.0.10'))
+      expect(results).to(include('ip6_addr' => 'ethernet0|2001:470:deed::100'))
     end
   end
 end

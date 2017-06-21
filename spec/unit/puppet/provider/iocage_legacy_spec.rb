@@ -33,9 +33,9 @@ describe provider_class do
 
       results = provider_class.get_jail_properties('b439bd7a-5376-11e7-ad91-d979c2a3eb55')
 
-      results.should(include('tag' => 'f11-puppet4'))
-      results.should(include('boot' => 'off'))
-      results.should(include('template' => 'yes'))
+      expect(results).to(include('tag' => 'f11-puppet4'))
+      expect(results).to(include('boot' => 'off'))
+      expect(results).to(include('template' => 'yes'))
     end
   end
 end
