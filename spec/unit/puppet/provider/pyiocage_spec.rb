@@ -109,10 +109,10 @@ describe provider_class do
   context '#get_jail_properties' do
     it 'parses jail properties' do
       list_fixture = File.read('spec/fixtures/pyiocage_list')
-      allow(provider_class).to receive(:iocage).with(['list']) { list_fixture }
+      allow(provider_class).to receive('/usr/local/bin/iocage').with(['list']) { list_fixture }
 
       get_fixture = File.read('spec/fixtures/pyiocage_jail_get_all')
-      allow(provider_class).to receive(:iocage).with(['get', 'all', 'f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21']) { get_fixture }
+      allow(provider_class).to receive('execute').with('/usr/local/bin/iocage get all f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21', {override_locale: false}) { get_fixture }
 
       results = provider_class.get_jail_properties('f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21')
 
