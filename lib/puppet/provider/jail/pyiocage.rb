@@ -55,7 +55,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   def self.instances
     jail_list.map do |j|
       jail_properties = {
-        provider: :iocage,
+        provider: :pyiocage,
         ensure: :present,
         name: j[:tag],
         state: j[:state],

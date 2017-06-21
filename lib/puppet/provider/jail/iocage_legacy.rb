@@ -46,7 +46,7 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
       jensure = all_properties['template'] == 'yes' ? :template : :present
 
       jail_properties = {
-        provider: :iocage,
+        provider: :iocage_legacy,
         ensure: jensure,
         name: j[:tag],
         state: j[:state],
