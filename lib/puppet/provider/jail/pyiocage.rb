@@ -1,25 +1,38 @@
 require 'tempfile'
 
-Puppet::Type.type(:jail).provide(:iocage) do
+Puppet::Type.type(:jail).provide(:pyiocage) do
   desc 'Manage jails using iocage(8)'
   confine    kernel: :freebsd
   defaultfor kernel: :freebsd
 
-  commands iocage: '/usr/local/sbin/iocage'
+  commands iocage: '/usr/local/bin/iocage'
 
   mk_resource_methods
 
-  def self.jail_list(*args)
-    output = iocage(['list', args].flatten).split("\n")
-    fields = output.shift.split.map { |i| i.downcase.to_sym }
+  def self.jail_list
+    output = execute('/usr/local/bin/iocage list -l', override_locale: false).split("\n")
+    output.shift
+
+    # Strip the leading and trailing pipe character from the lines to avoid
+    # splitting the pipe thats in the interface/address specification.
+    output.map! {|i| i.gsub(/^\|/, '') }
+    output.map! {|i| i.gsub(/\|$/, '') }
+
+    fields = output.shift.split(' | ').map { |i|
+      next if i.empty?
+      i.downcase.strip.rstrip.to_sym
+    }.compact
 
     data = []
 
     output.each do |j|
       jail_data = {}
-      values = j.split
+      values = j.split(' | ').map {|i|
+        next if i.empty?
+        i.strip.rstrip
+      }.compact
 
-      iocage_jail_list_regex = %r{^(-|[0-9]+)\s+([[:xdigit:]]{8}-([[:xdigit:]]{4}-){3})[[:xdigit:]]{12}\s+(on|off)\s+(up|down)\s+.+$}
+      iocage_jail_list_regex = %r{^\s+}
       next if iocage_jail_list_regex.match(j).nil?
 
       values.each_index do |i|
@@ -40,20 +53,18 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def self.instances
-    [jail_list, jail_list('-t')].each.map do |j|
-      all_properties = get_jail_properties(j[:tag])
-
-      jensure = all_properties['template'] == 'yes' ? :template : :present
-
+    jail_list.map do |j|
       jail_properties = {
         provider: :iocage,
-        ensure: jensure,
+        ensure: :present,
         name: j[:tag],
         state: j[:state],
         boot: j[:boot]
       }
 
       jail_properties[:jid] = j[:jid] if j[:jid] != '-'
+
+      all_properties = get_jail_properties(j[:tag])
 
       extra_properties = [
         :ip4_addr,
@@ -80,7 +91,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
 
   def self.get_jail_properties(jailname)
     data = {}
-    output = iocage(['get', 'all', jailname])
+    output = execute("/usr/local/bin/iocage get all #{jailname}", override_locale: false)
     output.lines.each do |l|
       key, value = l.split(':', 2)
       data[key] = value.chomp
@@ -93,7 +104,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def exists?
-    @property_hash[:ensure] == :present || @property_hash[:ensure] == :template
+    @property_hash[:ensure] == :present
   end
 
   def running?
@@ -101,7 +112,7 @@ Puppet::Type.type(:jail).provide(:iocage) do
   end
 
   def create
-    @property_flush[:ensure] = resource[:ensure]
+    @property_flush[:ensure] = :present
   end
 
   def destroy
@@ -164,9 +175,6 @@ Puppet::Type.type(:jail).provide(:iocage) do
         iocage(['destroy', '-f', resource[:name]])
       when :present
         iocage(['create', '-c', "tag=#{resource[:name]}"])
-      when :template
-        iocage(['create', '-c', "tag=#{resource[:name]}"])
-        set_property('template', 'yes')
       end
 
       if resource[:state] == :up && resource[:ensure] == :present
@@ -178,8 +186,9 @@ Puppet::Type.type(:jail).provide(:iocage) do
           tmpfile = Tempfile.new('puppet-iocage')
           tmpfile.write(resource[:user_data])
           tmpfile.close
-          execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh",
-                  stdinfile: tmpfile.path)
+          execute("/usr/local/bin/iocage exec #{resource[:name]} /bin/sh",
+                  stdinfile: tmpfile.path,
+                  override_locale: false)
           tmpfile.delete
         end
       end

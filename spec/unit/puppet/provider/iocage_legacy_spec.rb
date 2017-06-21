@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'puppet/provider/jail/iocage'
+require 'puppet/provider/jail/iocage_legacy'
 
-provider_class = Puppet::Type.type(:jail).provider(:iocage)
+provider_class = Puppet::Type.type(:jail).provider(:iocage_legacy)
 
 describe provider_class do
   context '#jail_list' do
