@@ -5,12 +5,18 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   confine    kernel: :freebsd
   defaultfor kernel: :freebsd
 
+  # this is used for further confinement
   commands iocage: '/usr/local/bin/iocage'
+
+  def self.pyiocage(*args)
+    cmd = ['/usr/local/bin/iocage', args].flatten.join(' ')
+    execute(cmd, override_locale: false)
+  end
 
   mk_resource_methods
 
   def self.jail_list
-    output = execute('/usr/local/bin/iocage list -l', override_locale: false).split("\n")
+    output = pyiocage('list', '-l').split("\n")
     output.shift
 
     # Strip the leading and trailing pipe character from the lines to avoid
@@ -91,7 +97,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   def self.get_jail_properties(jailname)
     data = {}
-    output = execute("/usr/local/bin/iocage get all #{jailname}", override_locale: false)
+    output = pyiocage('get', 'all', jailname)
     output.lines.each do |l|
       key, value = l.split(':', 2)
       data[key] = value.chomp
