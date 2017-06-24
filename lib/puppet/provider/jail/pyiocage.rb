@@ -16,31 +16,16 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   mk_resource_methods
 
   def self.jail_list
-    output = pyiocage('list', '-l').split("\n")
-    output.shift
-
-    # Strip the leading and trailing pipe character from the lines to avoid
-    # splitting the pipe thats in the interface/address specification.
-    output.map! { |i| i.gsub(%r{^\|}, '') }
-    output.map! { |i| i.gsub(%r{\|$}, '') }
-
-    fields = output.shift.split(' | ').map do |i|
-      next if i.empty?
-      i.downcase.strip.rstrip.to_sym
-    end.compact
+    # first, get the fields. We take them from -t, hoping this is less stuff
+    fields = pyiocage('list', '-lt').split("\n")[1].downcase.split(%r{\s+|\s+}).reject { |f| f == '|' }
+    output = pyiocage('list', '-Htl').split("\n")
+    output += pyiocage('list', '-Hl').split("\n")
 
     data = []
 
     output.each do |j|
       jail_data = {}
-      values = j.split(' | ').map do |i|
-        next if i.empty?
-        i.strip.rstrip
-      end.compact
-
-      iocage_jail_list_regex = %r{^\s+}
-      next if iocage_jail_list_regex.match(j).nil?
-
+      values = j.split(%r{^\s+})
       values.each_index do |i|
         jail_data[fields[i]] = values[i]
       end
@@ -60,9 +45,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   def self.instances
     jail_list.map do |j|
+      jensure = j[:type] == 'template' ? :template : :present
       jail_properties = {
         provider: :pyiocage,
-        ensure: :present,
+        ensure: jensure,
         name: j[:tag],
         state: j[:state],
         boot: j[:boot]
@@ -110,7 +96,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   end
 
   def exists?
-    @property_hash[:ensure] == :present
+    @property_hash[:ensure] == :present || @property_hash[:ensure] == :template
   end
 
   def running?
@@ -118,7 +104,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   end
 
   def create
-    @property_flush[:ensure] = :present
+    @property_flush[:ensure] = resource[:ensure]
   end
 
   def destroy
@@ -164,7 +150,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   def flush
     if @property_flush
-      Puppet.debug "JailIocage(#flush): #{@property_flush}"
+      Puppet.debug "JailPyIocage(#flush): #{@property_flush}"
 
       pre_start_properties = [
         :boot,
@@ -175,12 +161,20 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         :jail_zfs_dataset
       ]
 
+      frel = Facter.value(:os)['release']['full'].gsub(%r{-p\d+$}, '')
+
+      template = resource[:template] ? "--template=#{resource[:template]}" : nil
+      release = resource[:release] ? "--release=#{resource[:release]}" : "--release=#{frel}"
+      from = template.nil? ? release : template
+
       case resource[:ensure]
       when :absent
         iocage(['stop', resource[:name]])
-        iocage(['destroy', '-f', resource[:name]])
+        iocage(['destroy', '--force', resource[:name]])
       when :present
-        iocage(['create', '-c', "tag=#{resource[:name]}"])
+        iocage(['create', '--force', from, "tag=#{resource[:name]}"])
+      when :template
+        iocage(['create', '--force', from, 'template=yes' "tag=#{resource[:name]}"])
       end
 
       if resource[:state] == :up && resource[:ensure] == :present
