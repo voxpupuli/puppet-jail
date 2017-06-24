@@ -167,14 +167,21 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       release = resource[:release] ? "--release=#{resource[:release]}" : "--release=#{frel}"
       from = template.nil? ? release : template
 
+      unless resource[:pkglist].empty?
+        pkgfile = Tempfile.new('puppet-iocage-pkglist.json')
+        pkgfile.write({ pkgs: resource[:pkglist] }.to_json)
+        pkgfile.close
+        pkglist = "--pkglist=#{pkgfile.path}"
+      end
+
       case resource[:ensure]
       when :absent
         iocage(['stop', resource[:name]])
         iocage(['destroy', '--force', resource[:name]])
       when :present
-        iocage(['create', '--force', from, "tag=#{resource[:name]}"])
+        iocage(['create', '--force', from, pkglist, "tag=#{resource[:name]}"].compact)
       when :template
-        iocage(['create', '--force', from, 'template=yes' "tag=#{resource[:name]}"])
+        iocage(['create', '--force', from, pkglist, 'template=yes' "tag=#{resource[:name]}"].compact)
       end
 
       if resource[:state] == :up && resource[:ensure] == :present

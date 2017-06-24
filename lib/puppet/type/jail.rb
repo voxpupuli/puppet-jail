@@ -50,6 +50,10 @@ Puppet::Type.newtype(:jail) do
     newvalues(:on, :off)
   end
 
+  newparam(:pkglist, array_matching: :all) do
+    desc 'A list of packages to be installed in this jail before startup'
+  end
+
   newproperty(:jail_zfs_dataset) do
     desc 'Set the jail_zfs_data set iocage parameter'
     validate do |value|
