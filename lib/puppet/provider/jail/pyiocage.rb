@@ -18,16 +18,16 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   def self.jail_list
     # first, get the fields. We take them from -t, hoping this is less stuff
     fields = pyiocage('list', '-lt').split("\n")[1].downcase.split(%r{\s+|\s+}).reject { |f| f == '|' }
-    output = pyiocage('list', '-Htl').split("\n")
+    output  = pyiocage('list', '-Htl').split("\n")
     output += pyiocage('list', '-Hl').split("\n")
 
     data = []
 
     output.each do |j|
       jail_data = {}
-      values = j.split(%r{^\s+})
+      values = j.split(%r{\s+})
       values.each_index do |i|
-        jail_data[fields[i]] = values[i]
+        jail_data[fields[i].to_sym] = values[i]
       end
       data << jail_data
     end
