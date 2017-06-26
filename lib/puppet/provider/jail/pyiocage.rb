@@ -148,6 +148,38 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     @property_flush[:jail_zfs_dataset] = value
   end
 
+  def pkglist=(value)
+    @property_flush[:pkglist] = value
+  end
+
+  def wrap_create(jensure = resource[:ensure])
+    frel = Facter.value(:os)['release']['full'].gsub(%r{-p\d+$}, '')
+
+    template = resource[:template] ? "--template=#{resource[:template]}" : nil
+    release = resource[:release] ? "--release=#{resource[:release]}" : "--release=#{frel}"
+    from = template.nil? ? release : template
+
+    create_template = jensure == :template ? 'template=yes' : nil
+
+    unless resource[:pkglist].empty?
+      pkgfile = Tempfile.new('puppet-iocage-pkglist.json')
+      pkgfile.write({ pkgs: resource[:pkglist] }.to_json)
+      pkgfile.close
+      pkglist = "--pkglist=#{pkgfile.path}"
+    end
+    iocage(['create', '--force', from, pkglist, create_template, "tag=#{resource[:name]}"].compact)
+  end
+
+  def wrap_destroy
+    iocage(['stop', resource[:name]])
+    iocage(['destroy', '--force', resource[:name]])
+  end
+
+  def update
+    wrap_destroy
+    wrap_create
+  end
+
   def flush
     if @property_flush
       Puppet.debug "JailPyIocage(#flush): #{@property_flush}"
@@ -161,27 +193,13 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         :jail_zfs_dataset
       ]
 
-      frel = Facter.value(:os)['release']['full'].gsub(%r{-p\d+$}, '')
-
-      template = resource[:template] ? "--template=#{resource[:template]}" : nil
-      release = resource[:release] ? "--release=#{resource[:release]}" : "--release=#{frel}"
-      from = template.nil? ? release : template
-
-      unless resource[:pkglist].empty?
-        pkgfile = Tempfile.new('puppet-iocage-pkglist.json')
-        pkgfile.write({ pkgs: resource[:pkglist] }.to_json)
-        pkgfile.close
-        pkglist = "--pkglist=#{pkgfile.path}"
-      end
-
       case resource[:ensure]
       when :absent
-        iocage(['stop', resource[:name]])
-        iocage(['destroy', '--force', resource[:name]])
+        wrap_destroy
       when :present
-        iocage(['create', '--force', from, pkglist, "tag=#{resource[:name]}"].compact)
+        wrap_create(:present)
       when :template
-        iocage(['create', '--force', from, pkglist, 'template=yes' "tag=#{resource[:name]}"].compact)
+        wrap_create(:template)
       end
 
       if resource[:state] == :up && resource[:ensure] == :present

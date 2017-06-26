@@ -50,15 +50,26 @@ Puppet::Type.newtype(:jail) do
     newvalues(:on, :off)
   end
 
-  newparam(:pkglist, array_matching: :all) do
-    desc 'A list of packages to be installed in this jail before startup'
-  end
-
   newproperty(:jail_zfs_dataset) do
     desc 'Set the jail_zfs_data set iocage parameter'
     validate do |value|
       unless value.is_a? String
         raise ArgumentError, 'jail_zfs_dataset requires string value'
+      end
+    end
+  end
+
+  newparam(:pkglist, array_matching: :all) do
+    desc 'A list of packages to be installed in this jail before startup'
+    def insync?(is)
+      Array(is).sort == Array(@shouldA).sort
+    end
+
+    newvalues(%r{^}) do
+      begin
+        provider.update
+      rescue => detail
+        raise Puppet::Error, "Could not update: #{detail}"
       end
     end
   end
