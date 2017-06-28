@@ -158,14 +158,21 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
         :jail_zfs_dataset
       ]
 
+      unless resource[:pkglist].empty?
+        pkgfile = Tempfile.new('puppet-iocage-pkg.list')
+        pkgfile.write(resource[:pkglist].join("\n"))
+        pkgfile.close
+        pkglist = "--pkglist=#{pkgfile.path}"
+      end
+
       case resource[:ensure]
       when :absent
         iocage(['stop', resource[:name]])
         iocage(['destroy', '-f', resource[:name]])
       when :present
-        iocage(['create', '-c', "tag=#{resource[:name]}"])
+        iocage(['create', '-c', pkglist, "tag=#{resource[:name]}"].compact)
       when :template
-        iocage(['create', '-c', "tag=#{resource[:name]}"])
+        iocage(['create', '-c', pkglist, "tag=#{resource[:name]}"].compact)
         set_property('template', 'yes')
       end
 

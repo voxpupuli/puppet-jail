@@ -59,6 +59,21 @@ Puppet::Type.newtype(:jail) do
     end
   end
 
+  newparam(:pkglist, array_matching: :all) do
+    desc 'A list of packages to be installed in this jail before startup'
+    def insync?(is)
+      Array(is).sort == Array(@shouldA).sort
+    end
+
+    newvalues(%r{^}) do
+      begin
+        provider.update
+      rescue => detail
+        raise Puppet::Error, "Could not update: #{detail}"
+      end
+    end
+  end
+
   def refresh
     if @parameters[:state] == :up
       provider.restart
