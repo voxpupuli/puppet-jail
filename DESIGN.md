@@ -57,3 +57,10 @@ restarted, or rebuilt by puppet.
 Finally, if we want to continue using flush, we need to find a way to funnel
 these four essential operations, create, update, rebuild, destroy — in an
 idempotent manner.
+
+# (Backwards) Compatibility
+
+All these contemplation on design raise two questions:
+
+- (how) do we keep backwards compatibility with the old module
+- (how) do we bridge the gap between iocage_legacy and py3-iocage?
