@@ -27,16 +27,33 @@ any changes to the following parameters must trigger a reload (`iocage stop`
 followed by `iocage start`)
 
 * `ip4_addr` or `ip6_addr`
-* fstab entries
+* `fstab` entries
 * properties (except when template related!)
-* state (either `iocage start` xor `iocage stop`)
-* type (a template jail *cannot* run.)
+* `state` (either `iocage start` xor `iocage stop`)
+* `type` (a template jail *cannot* run.)
 
 any changes to the following parameters must trigger a rebuild:
 
-* template
-* release
-* ensure (`absent` causes destruction)
+* `template`
+* `release`
+* `ensure` (`absent` causes destruction)
+* `user_data` (our jails are immutable, so any mutation to them causes a
+  rebuild)
 
 
 # Mapping to puppet
+
+First and foremost, we should consider switching
+to [`--name`](https://github.com/iocage/iocage/issues/244) as `namevar` instead
+of using `tag=`.
+
+Next, we should generalize the handling of non-essential (anything not retrieved
+via `iocage list -l`)properties, by passing them in the properties hash.
+
+Given the nature of certain parameters (the ones that trigger a reload, or a
+rebuild), we should add an option which control whether a jail should be
+restarted, or rebuilt by puppet.
+
+Finally, if we want to continue using flush, we need to find a way to funnel
+these four essential operations, create, update, rebuild, destroy — in an
+idempotent manner.
