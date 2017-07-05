@@ -3,76 +3,73 @@ require 'puppet/provider/jail/pyiocage'
 
 provider_class = Puppet::Type.type(:jail).provider(:pyiocage)
 
+cmd = '/usr/local/bin/iocage'
+exec_props = { override_locale: false, failonfail: true, combine: true }
+
 describe provider_class do
   context '#jail_list' do
-    it 'parses jail listing' do
-      fixture_fields = File.read('spec/fixtures/pyiocage_list-f')
+    before do
       fixture_jails  = File.read('spec/fixtures/pyiocage_list-l')
       fixture_tmpl   = File.read('spec/fixtures/pyiocage_list-t')
       # provider_class.stub(:iocage).with(['list']) { fixture }
-      allow(provider_class).to receive(:execute).with('/usr/local/bin/iocage list -lt', override_locale: false) { fixture_fields }
-      allow(provider_class).to receive(:execute).with('/usr/local/bin/iocage list -Htl', override_locale: false) { fixture_tmpl }
-      allow(provider_class).to receive(:execute).with('/usr/local/bin/iocage list -Hl', override_locale: false) { fixture_jails }
+      allow(provider_class).to receive(:execute).with("#{cmd} list -Htl", exec_props) { fixture_tmpl }
+      allow(provider_class).to receive(:execute).with("#{cmd} list -Hl", exec_props) { fixture_jails }
+    end
 
-      wanted = [{ jid: '-',
-                  uuid: 'f946372e-1830-4eff-8448-b12e8f7c4264',
+    it 'parses jail listing' do
+      wanted = [{ jid: nil,
+                  uuid: 'f11-ats6',
                   boot: 'off',
                   state: 'down',
-                  tag: 'f11-ats6',
                   type: 'template',
                   release: '11.0-RELEASE-p10',
-                  ip4: 'vtnet0|172.16.0.6/12',
-                  ip6: '-',
-                  template: '-' },
-                { jid: '-',
-                  uuid: 'e27b37fe-1658-4150-b853-883153a1e33f',
+                  ip4_addr: 'vtnet0|172.16.0.6/12',
+                  ip6_addr: nil,
+                  template: nil },
+                { jid: nil,
+                  uuid: 'f11-php71',
                   boot: 'off',
                   state: 'down',
-                  tag: 'f11-php71',
                   type: 'template',
                   release: '11.0-RELEASE-p10',
-                  ip4: 'vtnet0|172.16.0.4/12',
-                  ip6: '-',
-                  template: '-' },
-                { jid: '-',
-                  uuid: '6cfbc2fb-2234-4bf8-bac3-c6c3c7bdbabf',
+                  ip4_addr: 'vtnet0|172.16.0.4/12',
+                  ip6_addr: nil,
+                  template: nil },
+                { jid: nil,
+                  uuid: 'f11-puppet4',
                   boot: 'off',
                   state: 'down',
-                  tag: 'f11-puppet4',
                   type: 'template',
                   release: '11.0-RELEASE-p10',
-                  ip4: '-',
-                  ip6: '-',
-                  template: '-' },
+                  ip4_addr: nil,
+                  ip6_addr: nil,
+                  template: nil },
                 { jid: '9',
-                  uuid: 'd439dfc9-2891-40c1-8d04-95024d9fa7bb',
+                  uuid: 'blag',
                   boot: 'off',
                   state: 'up',
-                  tag: 'blag',
                   type: 'jail',
                   release: '11.0-RELEASE-p10',
-                  ip4: 'vtnet0|172.16.0.5/12',
-                  ip6: '-',
+                  ip4_addr: 'vtnet0|172.16.0.5/12',
+                  ip6_addr: nil,
                   template: 'f11-php71' },
-                { jid: '-',
-                  uuid: 'f0c1c16a-ef74-4412-8322-00b77eef124e',
+                { jid: nil,
+                  uuid: 'cdn',
                   boot: 'off',
                   state: 'down',
-                  tag: 'cdn',
                   type: 'jail',
                   release: '11.0-RELEASE-p10',
-                  ip4: 'vtnet0|172.16.0.7/12',
-                  ip6: 'vtnet0|2a03:b0c0:3:d0::4c97:6007',
+                  ip4_addr: 'vtnet0|172.16.0.7/12',
+                  ip6_addr: 'vtnet0|2a03:b0c0:3:d0::4c97:6007',
                   template: 'f11-ats6' },
-                { jid: '-',
-                  uuid: 'aaecf4d2-56c8-4ce3-8cab-0851b4551c38',
+                { jid: nil,
+                  uuid: 'cdn01',
                   boot: 'off',
                   state: 'down',
-                  tag: 'cdn01',
                   type: 'jail',
                   release: '11.0-RELEASE-p10',
-                  ip4: 'vtnet0|172.16.0.8/12',
-                  ip6: 'vtnet0|2a03:b0c0:3:d0::4c97:6008',
+                  ip4_addr: 'vtnet0|172.16.0.8/12',
+                  ip6_addr: 'vtnet0|2a03:b0c0:3:d0::4c97:6008',
                   template: 'f11-ats6' }]
 
       expect(provider_class.jail_list).to eq(wanted)
@@ -80,23 +77,51 @@ describe provider_class do
   end
 
   context '#get_jail_properties' do
-    it 'parses jail properties' do
+    before do
       list_fixture = File.read('spec/fixtures/pyiocage_list')
-      allow(provider_class).to receive('/usr/local/bin/iocage').with(['list']) { list_fixture }
+      allow(provider_class).to receive(cmd).with(['list']) { list_fixture }
 
       get_fixture = File.read('spec/fixtures/pyiocage_jail_get_all')
-      allow(provider_class).to receive('execute').with('/usr/local/bin/iocage get all f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21', override_locale: false) { get_fixture }
+      allow(provider_class).to receive('execute').with("#{cmd} get all f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21", exec_props) { get_fixture }
+    end
 
-      results = provider_class.get_jail_properties('f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21')
+    it 'parses jail properties' do
+      results = provider_class.get_jail_properties('f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21').to_h
 
       expect(results).to(include(
-                           'tag'              => 'media2',
-                           'boot'             => 'on',
-                           'jail_zfs'         => 'on',
-                           'jail_zfs_dataset' => 'media_in',
-                           'ip4_addr'         => 'ethernet0|10.0.0.10',
-                           'ip6_addr'         => 'ethernet0|2001:470:deed::100'
+                           'openfiles' => 'off',
+                           'memoryuse' => '8G:log'
       ))
+    end
+  end
+
+  context '#empty jail_list' do
+    before do
+      provider_class.stubs(:iocage).with('list', '-Htl').returns ''
+      provider_class.stubs(:iocage).with('list', '-Hl').returns ''
+    end
+    it 'parses empty output an empty hash' do
+      expect(provider_class.jail_list).to eq([])
+    end
+  end
+
+  context '#fstab' do
+    before do
+      provider_class.stubs(:iocage).with('fstab', '-Hl', 'cyhr').returns <<-EOT
+0       /usr/local/etc/puppet /iocage/jails/cyhr/root/usr/local/etc/puppet nullfs ro 0 0
+1       /data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0
+      EOT
+      provider_class.stubs(:iocage).with('list', '-Htl').returns ''
+      provider_class.stubs(:iocage).with('list', '-Hl').returns <<-EOT
+19      cyhr    off     up      jail    11.0-RELEASE-p10        vtnet0|172.16.1.3/12    -       f11-php71
+      EOT
+
+      # we don't care about properties
+      provider_class.stubs(:iocage).with('get', 'all', 'default').returns ''
+      provider_class.stubs(:iocage).with('get', 'all', 'cyhr').returns ''
+    end
+    it 'parses fstab entries' do
+      expect(provider_class.instances[0].fstab).to eq(['/usr/local/etc/puppet', '/data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0'])
     end
   end
 end
