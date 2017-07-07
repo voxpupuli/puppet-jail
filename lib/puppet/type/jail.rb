@@ -15,7 +15,7 @@ Puppet::Type.newtype(:jail) do
     EOM
   end
 
-  # for py3-iocage, this can be uuid & tag, rather than just tag.
+  # for py3-iocage, this can be uuid & tag & hostname rather than just tag.
   newparam(:name, namevar: true) do
     desc 'The name of the jail, and only the name'
   end
@@ -75,13 +75,13 @@ Puppet::Type.newtype(:jail) do
     defaultto(Facter.value(:freebsd_release))
   end
 
-  newparam(:restart) do
+  newparam(:allow_restart) do
     desc 'Allow restarting of this jail'
     newvalues(:true, :false)
     defaultto(:true)
   end
 
-  newparam(:rebuild) do
+  newparam(:allow_rebuild) do
     desc 'Allow destroying! and rebuilding of this jail'
     newvalues(:true, :false)
     defaultto(:true)
@@ -106,17 +106,16 @@ Puppet::Type.newtype(:jail) do
     desc 'A list of fstab entries for this jail to be mounted into. By default these are nullfs mounts.'
   end
 
-  # XXX: Should this simply be made equal to namevar?
-  newproperty(:hostname) do
-    desc <<-EOM
-         Hostname of the jail
-
-         While this is part of the properties, we're providing more direct access to it.
-    EOM
-  end
-
   newproperty(:properties) do
     desc 'All properties (that deviate from the default)'
+  end
+
+  # global validation rules
+  validate do
+    raise ArgumentError, 'Templates cannot be set to start on boot!' if self[:boot] == :on && self[:type] == :template
+    raise ArgumentError, 'Templates cannot be set to started!' if self[:state] == :up && self[:type] == :template
+    raise ArgumentError, 'pkglist will need an IP address!' if self[:pkglist].nil? && self[:ip4_addr].nil? && self[:ip6_addr].nil?
+    raise ArgumentError, 'Cannot set both, `template` and `release` at the same time!' if self[:release] && self[:template]
   end
 
   def refresh
