@@ -19,7 +19,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   mk_resource_methods
 
-  @fields = %w[jid uuid boot state type release ip4_addr ip6_addr template]
+  @fields = %w(jid uuid boot state type release ip4_addr ip6_addr template)
 
   def self.jail_list
     output  = iocage('list', '-Htl').split("\n")
@@ -161,13 +161,26 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   end
 
   def wrap_destroy
-    iocage(['stop', resource[:name]])
     iocage(['destroy', '--force', resource[:name]])
+  end
+
+  # returns Optional[Tempfile] to the pkglist's contents
+  # users of this function should take care that it's deleted!
+  def create_pkglist(pkglist)
+    return nil if pkglist.nil? || pkglist.empty?
+    pkgfile = Tempfile.new('puppet-iocage.pkglist')
+    pkgfile.write({ pkgs: pkglist }.to_json)
+    pkgfile.close
+    pkgfile
+  end
+
+  def wrap_create(options, props)
+    iocage('create', options, "--name #{resource[:name]}", props)
   end
 
   def rebuild(options, props)
     wrap_destroy
-    iocage('create', options, "--name #{resource[:name]}", props)
+    wrap_create(options, props)
   end
 
   def flush
@@ -176,9 +189,12 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     if @property_flush
       Puppet.debug "JailPyIocage(#flush): #{@property_flush}"
 
+      # this will need cleanup after use!
+      pkgfile = create_pkglist(resource[:pkglist]) if @property_flush[:pkglist]
+      (options << '--pkglist' << pkgfile.path) if pkgfile
+
       (options << '--release' << resource[:release]) if @property_flush[:release]
       (options << '--template' << resource[:template]) if @property_flush[:template]
-      (options << '--pkglist' << resource[:pkglist]) if @property_flush[:pkglist]
 
       props << 'template=yes' if @property_flush[:type] == :template
       props << "ip4_addr=#{resource[:ip4_addr]}" if @property_flush[:ip4_addr]
@@ -192,10 +208,15 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       when :present
         iocage('create', options, "--name #{resource[:name]}", props)
       else
-        # can we ever get here?
+        # if we got here, one or more options on an existing jail changed
+        # all options are destructive, which means we need to rebuild the jail
+        # XXX: how do we back-fill the other parameters & properties?
         rebuild(options, props) if !options.empty? && resource[:allow_rebuild]
         rebuild(options, props) if @property_flush[:template] && resource[:allow_rebuild]
+        # other changes just need a restart, and are handled below
       end
+
+      pkgfile.delete if pkgfile
 
       if resource[:state] == :up && resource[:ensure] == :present
         iocage(['start', resource[:name]])
@@ -209,11 +230,16 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       end
 
       need_restart = false
-      pre_start_properties.each do |p|
+      [:ip4_addr, :ip6_addr].each do |p|
         if @property_flush[p]
           need_restart = true
           set_property(p.to_s, @property_flush[p])
         end
+      end
+
+      if @property_flush[:properties]
+        # none of these need a restart
+        @property_flush[:properties].each { |p, v| set_property(p.to_s, v) }
       end
 
       if @property_flush[:state]
