@@ -19,9 +19,9 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   mk_resource_methods
 
-  @fields = %w(jid uuid boot state type release ip4_addr ip6_addr template)
 
   def self.jail_list
+    fields = %w(jid uuid boot state type release ip4_addr ip6_addr template).freeze
     output  = iocage('list', '-Htl').split("\n")
     output += iocage('list', '-Hl').split("\n")
 
@@ -31,7 +31,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       jail_data = {}
       values = j.split(%r{\s+})
       values.each_index do |i|
-        jail_data[@fields[i].to_sym] = values[i]
+        jail_data[fields[i].to_sym] = values[i]
       end
       data << jail_data
     end

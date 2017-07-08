@@ -4,7 +4,8 @@ require 'puppet/type/jail'
 type_class = Puppet::Type.type(:jail)
 
 describe type_class do
-  [:absent, :present, :template].each do |v|
+
+  [:absent, :present].each do |v|
     it "should support #{v} as a value to :ensure" do
       j = type_class.new(name: 'myjail', ensure: v)
       expect(j.should(:ensure)).to eq(v)
@@ -14,20 +15,22 @@ describe type_class do
   let :params do
     [
       :name,
-      :jid,
-      :user_data
+      :user_data,
+      :pkglist,
+      :allow_rebuild,
+      :allow_restart
     ]
   end
 
   let :properties do
     [
       :ensure,
-      :state,
       :boot,
+      :state,
       :ip4_addr,
       :ip6_addr,
-      :jail_zfs,
-      :jail_zfs_dataset
+      :type,
+      :template
     ]
   end
 
