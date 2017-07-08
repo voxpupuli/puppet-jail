@@ -56,8 +56,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         state: j[:state],
         boot: j[:boot],
         type: j[:type],
+        release: j[:release],
         ip4_addr: j[:ip4_addr],
         ip6_addr: j[:ip6_addr]
+        template: j[:template],
       }
 
       jail_properties[:jid] = j[:jid] if j[:jid] != '-'
@@ -177,7 +179,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       props << 'template=yes' if @property_flush[:type] == :template
       props << "ip4_addr=#{resource[:ip4_addr]}" if @property_flush[:ip4_addr]
-      props << "ip4_addr=#{resource[:ip4_addr]}" if @property_flush[:ip4_addr]
+      props << "ip6_addr=#{resource[:ip6_addr]}" if @property_flush[:ip6_addr]
 
       props << resource[:properties].each { |k, v| [k, v].join('=') } if @property_flush[:properties]
 
