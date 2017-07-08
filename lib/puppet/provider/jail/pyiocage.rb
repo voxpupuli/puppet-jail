@@ -48,6 +48,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   end
 
   def self.instances
+    default_properties = get_jail_properties('default')
+
     jail_list.map do |j|
       jail_properties = {
         provider: :pyiocage,
@@ -58,16 +60,15 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         type: j[:type],
         release: j[:release],
         ip4_addr: j[:ip4_addr],
-        ip6_addr: j[:ip6_addr]
-        template: j[:template],
+        ip6_addr: j[:ip6_addr],
+        template: j[:template]
       }
 
-      jail_properties[:jid] = j[:jid] if j[:jid] != '-'
+      jail_properties[:jid] = j[:jid] unless j[:jid] == '-'
 
       all_properties = get_jail_properties(j[:uuid])
-      default_properties = get_jail_properties('default')
-
-      jail_properties[:properties] = default_properties - all_properties
+      our_props = (all_properties - default_properties).to_h
+      jail_properties[:properties] = our_props.empty? ? nil : our_props
 
       debug jail_properties
 
@@ -80,6 +81,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     @property_flush = {}
   end
 
+  # returns a frozen Set.
+  # that's easier to work with and more performant.
   def self.get_jail_properties(jailname)
     data = {}
     output = iocage('get', 'all', jailname)
@@ -91,7 +94,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
     debug data
 
-    data
+    Set.new(data).freeze
   end
 
   def exists?
