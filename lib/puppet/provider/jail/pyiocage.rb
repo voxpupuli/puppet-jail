@@ -162,9 +162,9 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     iocage(['destroy', '--force', resource[:name]])
   end
 
-  def rebuild
+  def rebuild(options, props)
     wrap_destroy
-    wrap_create
+    iocage('create', options, "--name #{resource[:name]}", props)
   end
 
   def flush
@@ -188,6 +188,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         wrap_destroy
       when :present
         iocage('create', options, "--name #{resource[:name]}", props)
+      else
+        # can we ever get here?
+        rebuild(options, props) if !options.empty? && resource[:allow_rebuild]
+        rebuild(options, props) if @property_flush[:template] && resource[:allow_rebuild]
       end
 
       if resource[:state] == :up && resource[:ensure] == :present
