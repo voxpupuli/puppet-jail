@@ -19,7 +19,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   mk_resource_methods
 
-  @fields = %w[jid uuid boot state tag type release ip4_addr ip6_addr template]
+  @fields = %w[jid uuid boot state type release ip4_addr ip6_addr template]
 
   def self.jail_list
     output  = iocage('list', '-Htl').split("\n")

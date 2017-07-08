@@ -15,9 +15,9 @@ Puppet::Type.newtype(:jail) do
     EOM
   end
 
-  # for py3-iocage, this can be uuid & tag & hostname rather than just tag.
+  # for py3-iocage, this can be uuid & hostname
   newparam(:name, namevar: true) do
-    desc 'The name of the jail, and only the name'
+    desc 'The name (and hostname) of the jail'
   end
 
   newproperty(:boot) do
