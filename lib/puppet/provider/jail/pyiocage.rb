@@ -31,7 +31,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       jail_data = {}
       values = j.split(%r{\s+})
       values.each_index do |i|
-        jail_data[fields[i].to_sym] = values[i]
+        jail_data[fields[i].to_sym] = values[i] != '-' ? values[i] : nil
       end
       data << jail_data
     end
@@ -53,7 +53,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     jail_list.map do |j|
       jail_properties = {
         provider: :pyiocage,
-        ensure: j[:ensure],
+        ensure: :present,
+        jid: j[:jid],
         name: j[:uuid],
         state: j[:state],
         boot: j[:boot],
@@ -63,8 +64,6 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         ip6_addr: j[:ip6_addr],
         template: j[:template]
       }
-
-      jail_properties[:jid] = j[:jid] unless j[:jid] == '-'
 
       all_properties = get_jail_properties(j[:uuid])
       our_props = (all_properties - default_properties).to_h
