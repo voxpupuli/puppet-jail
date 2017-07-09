@@ -169,6 +169,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     @property_flush[:pkglist] = value
   end
 
+  def properties=(value)
+    @property_flush[:properties] = value
+  end
+
   def wrap_destroy
     iocage(['destroy', '--force', resource[:name]])
   end
