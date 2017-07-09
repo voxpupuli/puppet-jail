@@ -2,10 +2,7 @@
 #
 
 Puppet::Type.newtype(:jail) do
-  newproperty(:ensure) do
-    desc 'Ensure jail present, absent'
-    newvalues(:present, :absent)
-  end
+  ensurable
 
   newproperty(:jid) do
     desc <<-EOM

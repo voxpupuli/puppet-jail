@@ -187,13 +187,9 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     pkgfile
   end
 
-  def wrap_create(options, props)
-    iocage('create', options, "--name #{resource[:name]}", props)
-  end
-
   def rebuild(options, props)
-    wrap_destroy
-    wrap_create(options, props)
+    iocage(['destroy', '--force', resource[:name]])
+    iocage('create', options, "--name #{resource[:name]}", props)
   end
 
   def flush
@@ -217,7 +213,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       case resource[:ensure]
       when :absent
-        wrap_destroy
+        iocage(['destroy', '--force', resource[:name]])
       when :present
         iocage('create', options, "--name #{resource[:name]}", props)
       else
