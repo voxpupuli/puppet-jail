@@ -79,6 +79,12 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       our_props = (all_properties - default_properties).to_h
       jail_properties[:properties] = our_props.empty? ? nil : our_props
 
+      fstabs = iocage('get', '-H', 'fstab', resource[:name]).split("\n")
+      jail_properties[:fstab] = [] unless fstabs.empty?
+      fstabs.each do |f|
+        jail_properties[:fstab] << f.split(%r{\s+})[1]
+      end
+
       debug jail_properties
 
       new(jail_properties)
@@ -171,6 +177,18 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   def properties=(value)
     @property_flush[:properties] = value
+  end
+
+  def fstab=(value)
+    desired_fstab = Array(value)
+    current_fstab = Array(fstab)
+    (current_fstab - desired_fstab).each do |f|
+      iocage('fstab', '--remove', resource[:name], f)
+    end
+    (desirec_fstab - current_fstab).each do |f|
+      iocage('fstab', '--remove', resource[:name], f)
+    end
+    @property_flush[:fstab] = value
   end
 
   # returns Optional[Tempfile] to the pkglist's contents
