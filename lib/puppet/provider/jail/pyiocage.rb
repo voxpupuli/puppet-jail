@@ -202,8 +202,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       (options << '--template' << resource[:template]) if resource[:template]
 
       props << 'template=yes' if resource[:type] == :template
-      props << "ip4_addr=#{resource[:ip4_addr]}" if resource[:ip4_addr]
-      props << "ip6_addr=#{resource[:ip6_addr]}" if resource[:ip6_addr]
+      props << "ip4_addr='#{resource[:ip4_addr]}'" if resource[:ip4_addr]
+      props << "ip6_addr='#{resource[:ip6_addr]}'" if resource[:ip6_addr]
 
       props << resource[:properties].each { |k, v| [k, v].join('=') } if resource[:properties]
 
