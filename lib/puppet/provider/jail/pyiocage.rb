@@ -173,10 +173,6 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     @property_flush[:properties] = value
   end
 
-  def wrap_destroy
-    iocage(['destroy', '--force', resource[:name]])
-  end
-
   # returns Optional[Tempfile] to the pkglist's contents
   # users of this function should take care that it's deleted!
   def create_pkglist(pkglist)
@@ -199,17 +195,17 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       Puppet.debug "JailPyIocage(#flush): #{@property_flush}"
 
       # this will need cleanup after use!
-      pkgfile = create_pkglist(resource[:pkglist]) if @property_flush[:pkglist]
+      pkgfile = create_pkglist(resource[:pkglist]) if resource[:pkglist]
       (options << '--pkglist' << pkgfile.path) if pkgfile
 
-      (options << '--release' << resource[:release]) if @property_flush[:release]
-      (options << '--template' << resource[:template]) if @property_flush[:template]
+      (options << '--release' << resource[:release]) if resource[:release]
+      (options << '--template' << resource[:template]) if resource[:template]
 
-      props << 'template=yes' if @property_flush[:type] == :template
-      props << "ip4_addr=#{resource[:ip4_addr]}" if @property_flush[:ip4_addr]
-      props << "ip6_addr=#{resource[:ip6_addr]}" if @property_flush[:ip6_addr]
+      props << 'template=yes' if resource[:type] == :template
+      props << "ip4_addr=#{resource[:ip4_addr]}" if resource[:ip4_addr]
+      props << "ip6_addr=#{resource[:ip6_addr]}" if resource[:ip6_addr]
 
-      props << resource[:properties].each { |k, v| [k, v].join('=') } if @property_flush[:properties]
+      props << resource[:properties].each { |k, v| [k, v].join('=') } if resource[:properties]
 
       case resource[:ensure]
       when :absent
