@@ -185,8 +185,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     (current_fstab - desired_fstab).each do |f|
       iocage('fstab', '--remove', resource[:name], f)
     end
-    (desirec_fstab - current_fstab).each do |f|
-      iocage('fstab', '--remove', resource[:name], f)
+    (desired_fstab - current_fstab).each do |f|
+      iocage('fstab', '--add', resource[:name], f)
     end
     @property_flush[:fstab] = value
   end
