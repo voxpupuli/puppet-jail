@@ -96,4 +96,34 @@ describe provider_class do
       ))
     end
   end
+
+  context '#empty jail_list' do
+    before do
+      provider_class.stubs(:iocage).with('list', '-Htl').returns ''
+      provider_class.stubs(:iocage).with('list', '-Hl').returns ''
+    end
+    it 'parses empty output an empty hash' do
+      expect(provider_class.jail_list).to eq([])
+    end
+  end
+
+  context '#fstab' do
+    before do
+      provider_class.stubs(:iocage).with('fstab', '-Hl', 'cyhr').returns <<-EOT
+0       /usr/local/etc/puppet /iocage/jails/cyhr/root/usr/local/etc/puppet nullfs ro 0 0
+1       /data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0
+      EOT
+      provider_class.stubs(:iocage).with('list', '-Htl').returns ''
+      provider_class.stubs(:iocage).with('list', '-Hl').returns <<-EOT
+19      cyhr    off     up      jail    11.0-RELEASE-p10        vtnet0|172.16.1.3/12    -       f11-php71
+      EOT
+
+      # we don't care about properties
+      provider_class.stubs(:iocage).with('get', 'all', 'default').returns ''
+      provider_class.stubs(:iocage).with('get', 'all', 'cyhr').returns ''
+    end
+    it 'parses fstab entries' do
+      expect(provider_class.instances[0].fstab).to eq(['/usr/local/etc/pupppet', '/data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0'])
+    end
+  end
 end
