@@ -10,7 +10,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   def self.iocage(*args)
     cmd = ['/usr/local/bin/iocage', args].flatten.join(' ')
-    execute(cmd, override_locale: false)
+    execute(cmd, override_locale: false, failonfail: true)
   end
 
   def iocage(*args)
@@ -79,7 +79,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       our_props = (all_properties - default_properties).to_h
       jail_properties[:properties] = our_props.empty? ? nil : our_props
 
-      fstabs = iocage('get', '-H', 'fstab', j[:uuid]).split("\n")
+      fstabs = iocage('fstab', '-Hl', j[:uuid]).split("\n")
       jail_properties[:fstab] = [] unless fstabs.empty?
       fstabs.each do |f|
         jail_properties[:fstab] << f.split(%r{\s+})[1]

@@ -23,13 +23,16 @@ describe type_class do
 
   let :properties do
     [
+      :jid,
       :ensure,
       :boot,
       :state,
       :ip4_addr,
       :ip6_addr,
       :type,
-      :template
+      :template,
+      :fstab,
+      :properties,
     ]
   end
 

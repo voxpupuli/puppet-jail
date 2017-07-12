@@ -3,15 +3,21 @@ require 'puppet/provider/jail/pyiocage'
 
 provider_class = Puppet::Type.type(:jail).provider(:pyiocage)
 
+cmd = '/usr/local/bin/iocage'
+exec_props = { override_locale: false, failonfail: true }
+
+
 describe provider_class do
   context '#jail_list' do
-    it 'parses jail listing' do
+    before do
       fixture_jails  = File.read('spec/fixtures/pyiocage_list-l')
       fixture_tmpl   = File.read('spec/fixtures/pyiocage_list-t')
       # provider_class.stub(:iocage).with(['list']) { fixture }
-      allow(provider_class).to receive(:execute).with('/usr/local/bin/iocage list -Htl', override_locale: false) { fixture_tmpl }
-      allow(provider_class).to receive(:execute).with('/usr/local/bin/iocage list -Hl', override_locale: false) { fixture_jails }
+      allow(provider_class).to receive(:execute).with("#{cmd} list -Htl", exec_props) { fixture_tmpl }
+      allow(provider_class).to receive(:execute).with("#{cmd} list -Hl", exec_props) { fixture_jails }
+    end
 
+    it 'parses jail listing' do
       wanted = [{ jid: nil,
                   uuid: 'f11-ats6',
                   boot: 'off',
@@ -72,13 +78,15 @@ describe provider_class do
   end
 
   context '#get_jail_properties' do
-    it 'parses jail properties' do
+    before do
       list_fixture = File.read('spec/fixtures/pyiocage_list')
-      allow(provider_class).to receive('/usr/local/bin/iocage').with(['list']) { list_fixture }
+      allow(provider_class).to receive(cmd).with(['list']) { list_fixture }
 
       get_fixture = File.read('spec/fixtures/pyiocage_jail_get_all')
-      allow(provider_class).to receive('execute').with('/usr/local/bin/iocage get all f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21', override_locale: false) { get_fixture }
+      allow(provider_class).to receive('execute').with("#{cmd} get all f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21", exec_props) { get_fixture }
+    end
 
+    it 'parses jail properties' do
       results = provider_class.get_jail_properties('f9e67f5a-4bbe-11e6-a9b4-eca86bff7d21').to_h
 
       expect(results).to(include(
