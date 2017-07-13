@@ -123,7 +123,7 @@ describe provider_class do
       provider_class.stubs(:iocage).with('get', 'all', 'cyhr').returns ''
     end
     it 'parses fstab entries' do
-      expect(provider_class.instances[0].fstab).to eq(['/usr/local/etc/pupppet', '/data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0'])
+      expect(provider_class.instances[0].fstab).to eq(['/usr/local/etc/puppet', '/data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0'])
     end
   end
 end
