@@ -99,7 +99,7 @@ Puppet::Type.newtype(:jail) do
 
   newproperty(:fstab, array_matching: :all) do
     desc 'A list of fstab entries for this jail to be mounted into. By default these are nullfs mounts.'
-    # TODO add validation here
+    # TODO: add validation here
   end
 
   newproperty(:properties) do

@@ -6,7 +6,6 @@ provider_class = Puppet::Type.type(:jail).provider(:pyiocage)
 cmd = '/usr/local/bin/iocage'
 exec_props = { override_locale: false, failonfail: true }
 
-
 describe provider_class do
   context '#jail_list' do
     before do
@@ -91,7 +90,7 @@ describe provider_class do
 
       expect(results).to(include(
                            'openfiles' => 'off',
-                           'memoryuse' => '8G:log',
+                           'memoryuse' => '8G:log'
       ))
     end
   end

@@ -32,7 +32,7 @@ describe type_class do
       :type,
       :template,
       :fstab,
-      :properties,
+      :properties
     ]
   end
 
