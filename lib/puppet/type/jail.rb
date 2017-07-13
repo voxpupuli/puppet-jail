@@ -110,6 +110,7 @@ Puppet::Type.newtype(:jail) do
   validate do
     raise ArgumentError, 'Templates cannot be set to start on boot!' if self[:boot] == :on && self[:type] == :template
     raise ArgumentError, 'Templates cannot be set to started!' if self[:state] == :up && self[:type] == :template
+    raise ArgumentError, 'Templates cannot have `fstab` entries!' if !self[:fstab].nil? && self[:type] == :template
     raise ArgumentError, 'pkglist will need an IP address!' if !self[:pkglist].nil? && self[:ip4_addr].nil? && self[:ip6_addr].nil?
     raise ArgumentError, 'Cannot set both, `template` and `release` at the same time!' if self[:release] && self[:template]
   end

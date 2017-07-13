@@ -79,14 +79,16 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       our_props = (all_properties - default_properties).to_h
       jail_properties[:properties] = our_props.empty? ? nil : our_props
 
-      fstabs = iocage('fstab', '-Hl', j[:uuid]).split("\n")
-      jail_properties[:fstab] = [] unless fstabs.empty?
-      fstabs.each do |f|
-        _, src, dst, fs, opts, freq, passno = f.split(%r{\s+})
-        if dst =~ /#{src}$/ && fs == 'nullfs' && opts == 'ro'
-          jail_properties[:fstab] << src
-        else
-          jail_properties[:fstab] << "#{src} #{dst} #{fs} #{opts} #{freq} #{passno}"
+      if j[:type] == 'jail'
+        fstabs = iocage('fstab', '-Hl', j[:uuid]).split("\n")
+        jail_properties[:fstab] = [] unless fstabs.empty?
+        fstabs.each do |f|
+          _, src, dst, fs, opts, freq, passno = f.split(%r{\s+})
+          if dst =~ /#{src}$/ && fs == 'nullfs' && opts == 'ro'
+            jail_properties[:fstab] << src
+          else
+            jail_properties[:fstab] << "#{src} #{dst} #{fs} #{opts} #{freq} #{passno}"
+          end
         end
       end
 
