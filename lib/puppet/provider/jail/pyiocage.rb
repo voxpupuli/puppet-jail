@@ -112,7 +112,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       key, value = l.split(':', 2)
       data[key] = value.chomp
     end
-    data.reject! { |k, v| k.nil? || v.nil? }
+    data.reject! { |k, v| k.nil? || Fields.include?(k.to_sym) || v.nil? || v == jailname }
 
     debug data
 
