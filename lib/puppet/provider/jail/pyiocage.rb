@@ -28,7 +28,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     :release,
     :ip4_addr,
     :ip6_addr,
-    :template
+    :template,
+    :cloned_release # cheat to filter out cloned_release from `properties`
   ].freeze
 
   def self.jail_list
