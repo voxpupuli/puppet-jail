@@ -113,6 +113,7 @@ Puppet::Type.newtype(:jail) do
     raise ArgumentError, 'Templates cannot have `fstab` entries!' if !self[:fstab].nil? && self[:type] == :template
     raise ArgumentError, 'pkglist will need an IP address!' if !self[:pkglist].nil? && self[:ip4_addr].nil? && self[:ip6_addr].nil?
     raise ArgumentError, 'Cannot set both, `template` and `release` at the same time!' if self[:release] && self[:template]
+    raise ArgumentError, 'Must supply either `template` or `release`!' if !self[:release] && !self[:template]
   end
 
   # `jail { x: release => foo }` should depend on jail_release { foo: }
