@@ -115,6 +115,16 @@ Puppet::Type.newtype(:jail) do
     raise ArgumentError, 'Cannot set both, `template` and `release` at the same time!' if self[:release] && self[:template]
   end
 
+  # `jail { x: release => foo }` should depend on jail_release { foo: }
+  autorequire(:jail_release) do
+    @properties[:release] if @properties.include? :release
+  end
+
+  # `jail { x: template => foo }` should depend on jail { foo: template => yes }
+  autorequire(:jail) do
+    self[:template] if @properties.include? :template
+  end
+
   def refresh
     if @parameters[:state] == :up
       provider.restart
