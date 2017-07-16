@@ -118,12 +118,12 @@ Puppet::Type.newtype(:jail) do
 
   # `jail { x: release => foo }` should depend on jail_release { foo: }
   autorequire(:jail_release) do
-    @properties[:release] if @properties.include? :release
+    self[:release] if self[:release]
   end
 
   # `jail { x: template => foo }` should depend on jail { foo: template => yes }
   autorequire(:jail) do
-    self[:template] if @properties.include? :template
+    self[:template] if self[:template]
   end
 
   def refresh
