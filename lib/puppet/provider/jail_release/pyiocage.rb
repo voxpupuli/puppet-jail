@@ -8,7 +8,7 @@ Puppet::Type.type(:jail_release).provide(:pyiocage) do
 
   def self.iocage(*args)
     cmd = ['/usr/local/bin/iocage', args].flatten.join(' ')
-    execute(cmd, override_locale: false, failonfail: true)
+    execute(cmd, override_locale: false, failonfail: true, combine: true)
   end
 
   def iocage(*args)
