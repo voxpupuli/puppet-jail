@@ -4,7 +4,7 @@ require 'puppet/provider/jail/pyiocage'
 provider_class = Puppet::Type.type(:jail).provider(:pyiocage)
 
 cmd = '/usr/local/bin/iocage'
-exec_props = { override_locale: false, failonfail: true }
+exec_props = { override_locale: false, failonfail: true, combine: true }
 
 describe provider_class do
   context '#jail_list' do
