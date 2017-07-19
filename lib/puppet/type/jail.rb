@@ -45,6 +45,14 @@ Puppet::Type.newtype(:jail) do
 
          Changes to this property will lead to destruction and rebuild of the jail.
     EOM
+
+    # iocage list -l will report release *with* the -patch level, but iocage
+    # fetch expects it *without* the patch level.
+    #
+    # this is how we deal with that:
+    def insync?(is)
+      is.start_with?(@should)
+    end
   end
 
   newproperty(:ip4_addr) do
