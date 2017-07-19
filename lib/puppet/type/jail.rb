@@ -15,6 +15,7 @@ Puppet::Type.newtype(:jail) do
   # for py3-iocage, this can be uuid & hostname
   newparam(:name, namevar: true) do
     desc 'The name (and hostname) of the jail'
+    newvalues(%r{^[a-zA-Z0-9_-]+$})
   end
 
   newproperty(:boot) do
