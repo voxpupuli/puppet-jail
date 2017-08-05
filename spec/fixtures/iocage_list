@@ -1,0 +1,26 @@
+JID   UUID                                  BOOT  STATE  TAG
+-     018e776d-4315-11e5-94bc-0025905cf7cc  off   down   auth4
+-     14b47568-448e-11e5-94bc-0025905cf7cc  off   down   graphite2
+1     19e2885e-448e-11e5-94bc-0025905cf7cc  on    up     git2
+2     64a7af2c-4909-11e5-9073-0025905cf7cc  on    up     pm3
+-     c3936d1d-46f5-11e5-9073-0025905cf7cc  off   down   ns1
+333   ca29dc76-46f6-11e5-9073-0025905cf7cc  on    up     pdb2
+-     e2f5f461-4314-11e5-94bc-0025905cf7cc  off   down   mon1
+10    e2f5f462-4314-11e5-94bc-0025905cf7cc  off   down   mon2
+-     fdd4151c-d555-11e5-b08a-0025906cac26  off   down   741ac3b9-7c44-4400-8916-4ee6037d94bd
+--- non iocage jails currently active ---
+JID   PATH                                  IP4              HOSTNAME 
+4     /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default
+5     /usr/local/poudriere/data/.m/10amd64  -                10amd64-default
+6     /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default-job-05
+7     /usr/local/poudriere/data/.m/10amd64  -                10amd64-default-job-05
+8     /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default-job-02
+9     /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default-job-06
+10    /usr/local/poudriere/data/.m/10amd64  -                10amd64-default-job-02
+11    /usr/local/poudriere/data/.m/10amd64  -                10amd64-default-job-06
+12    /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default-job-04
+13    /usr/local/poudriere/data/.m/10amd64  -                10amd64-default-job-04
+14    /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default-job-01
+15    /usr/local/poudriere/data/.m/10amd64  -                10amd64-default-job-01
+16    /usr/local/poudriere/data/.m/10amd64  127.0.0.1        10amd64-default-job-03
+17    /usr/local/poudriere/data/.m/10amd64  -                10amd64-default-job-03

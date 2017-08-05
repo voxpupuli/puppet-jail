@@ -41,17 +41,22 @@ Puppet::Type.newtype(:jail) do
 
   newproperty(:release) do
     desc <<-EOM
-         FreeBSD release of this jail. `EMPTY` if this is a Linux jail. `release` and `template` are mutually exclusive.
+         FreeBSD release of this jail. `EMPTY` if this is a Linux jail.  `release` and `template` are mutually exclusive.
 
          Changes to this property will lead to destruction and rebuild of the jail.
     EOM
+
+    validate do |value|
+      raise "Release must be a string, not '#{value.class}'" unless value.is_a?(String)
+    end
 
     # iocage list -l will report release *with* the -patch level, but iocage
     # fetch expects it *without* the patch level.
     #
     # this is how we deal with that:
     def insync?(is)
-      is.start_with?(@should)
+      should = @should.is_a?(Array) ? @should.first : @should
+      is.start_with?(should)
     end
   end
 
@@ -138,13 +143,15 @@ Puppet::Type.newtype(:jail) do
   end
 
   # global validation rules
-  validate do
-    raise ArgumentError, 'Templates cannot be set to start on boot!' if self[:boot] == :on && self[:type] == :template
-    raise ArgumentError, 'Templates cannot be set to started!' if self[:state] == :up && self[:type] == :template
-    raise ArgumentError, 'Templates cannot have `fstab` entries!' if !self[:fstab].nil? && self[:type] == :template
-    raise ArgumentError, 'pkglist will need an IP address!' if !self[:pkglist].nil? && self[:ip4_addr].nil? && self[:ip6_addr].nil?
-    raise ArgumentError, 'Cannot set both, `template` and `release` at the same time!' if self[:release] && self[:template]
-    raise ArgumentError, 'Must supply either `template` or `release`!' if !self[:release] && !self[:template]
+  if Puppet.run_mode.master?
+    validate do
+      raise ArgumentError, 'Templates cannot be set to start on boot!' if self[:boot] == :on && self[:type] == :template
+      raise ArgumentError, 'Templates cannot be set to started!' if self[:state] == :up && self[:type] == :template
+      raise ArgumentError, 'Templates cannot have `fstab` entries!' if !self[:fstab].nil? && self[:type] == :template
+      raise ArgumentError, 'pkglist will need an IP address!' if !self[:pkglist].nil? && self[:ip4_addr].nil? && self[:ip6_addr].nil?
+      raise ArgumentError, 'Cannot set both, `template` and `release` at the same time!' if self[:release] && self[:template]
+      raise ArgumentError, 'Must supply either `template` or `release`!' if !self[:release] && !self[:template]
+    end
   end
 
   # `jail { x: release => foo }` should depend on jail_release { foo: }
