@@ -235,16 +235,20 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       case resource[:ensure]
       when :absent
-        iocage(['destroy', '--force', resource[:name]])
+        unless @property_hash[:ensure] != :present
+          iocage(['destroy', '--force', resource[:name]])
+        end
       when :present
-        iocage('create', options, "--name #{resource[:name]}", props)
-      else
-        # if we got here, one or more options on an existing jail changed
-        # all options are destructive, which means we need to rebuild the jail
-        # XXX: how do we back-fill the other parameters & properties?
-        rebuild(options, props) if !options.empty? && resource[:allow_rebuild]
-        rebuild(options, props) if @property_flush[:template] && resource[:allow_rebuild]
-        # other changes just need a restart, and are handled below
+        unless @property_hash[:ensure] == :present
+          iocage('create', options, "--name #{resource[:name]}", props)
+        # else
+        #   # if we got here, one or more options on an existing jail changed
+        #   # all options are destructive, which means we need to rebuild the jail
+        #   # XXX: how do we back-fill the other parameters & properties?
+        #   rebuild(options, props) if !options.empty? && resource[:allow_rebuild]
+        #   rebuild(options, props) if @property_flush[:template] && resource[:allow_rebuild]
+        #   # other changes just need a restart, and are handled below
+        end
       end
 
       pkgfile.delete if pkgfile
