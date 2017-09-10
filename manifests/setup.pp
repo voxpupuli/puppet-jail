@@ -8,8 +8,8 @@ class jail::setup (
 ) {
 
   package { 'iocage':
-    name   => $package_name,
     ensure => installed,
+    name   => $package_name,
   }
 
   service { 'iocage':
