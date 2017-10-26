@@ -47,7 +47,7 @@ Puppet::Type.newtype(:jail) do
     EOM
 
     validate do |value|
-      self.fail "Release must be a string, not '#{value.class}'" unless value.is_a?(String)
+      raise "Release must be a string, not '#{value.class}'" unless value.is_a?(String)
     end
 
     # iocage list -l will report release *with* the -patch level, but iocage
