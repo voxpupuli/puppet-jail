@@ -46,23 +46,23 @@ Puppet::Type.newtype(:jail) do
   end
 
   newproperty(:pcpu) do
-    desc "Cap the CPU usage of a jail"
+    desc 'Cap the CPU usage of a jail'
   end
 
   newproperty(:memoryuse) do
-    desc "Cap the RAM usage of a jail"
+    desc 'Cap the RAM usage of a jail'
   end
 
   newproperty(:quota) do
-    desc "Set maximum disk usage for a jail"
+    desc 'Set maximum disk usage for a jail'
   end
 
   newproperty(:release) do
-    desc "Set jail version"
+    desc 'Set jail version'
   end
 
   newproperty(:rlimits) do
-    desc "Enable|Disable Limits"
+    desc 'Enable|Disable Limits'
     newvalues(:on, :off)
   end
 
