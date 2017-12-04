@@ -45,6 +45,27 @@ Puppet::Type.newtype(:jail) do
     desc 'Hostname of the jail'
   end
 
+  newproperty(:pcpu) do
+    desc 'Cap the CPU usage of a jail'
+  end
+
+  newproperty(:memoryuse) do
+    desc 'Cap the RAM usage of a jail'
+  end
+
+  newproperty(:quota) do
+    desc 'Set maximum disk usage for a jail'
+  end
+
+  newproperty(:release) do
+    desc 'Set jail version'
+  end
+
+  newproperty(:rlimits) do
+    desc 'Enable|Disable Limits'
+    newvalues(:on, :off)
+  end
+
   newproperty(:jail_zfs) do
     desc 'Enable the jail_zfs'
     newvalues(:on, :off)

@@ -59,6 +59,11 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
         :ip4_addr,
         :ip6_addr,
         :hostname,
+        :pcpu,
+        :memoryuse,
+        :quota,
+        :release,
+        :rlimits,
         :jail_zfs,
         :jail_zfs_dataset
       ]
@@ -137,6 +142,26 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
     @property_flush[:hostname] = value
   end
 
+  def pcpu=(value)
+    @property_flush[:pcpu] = value
+  end
+
+  def memoryuse=(value)
+    @property_flush[:memoryuse] = value
+  end
+
+  def quota=(value)
+    @property_flush[:quota] = value
+  end
+
+  def release=(value)
+    @property_flush[:release] = value
+  end
+
+  def rlimits=(value)
+    @property_flush[:rlimits] = value
+  end
+
   def jail_zfs=(value)
     @property_flush[:jail_zfs] = value
   end
@@ -154,6 +179,11 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
         :ip4_addr,
         :ip6_addr,
         :hostname,
+        :pcpu,
+        :memoryuse,
+        :quota,
+        :release,
+        :rlimits,
         :jail_zfs,
         :jail_zfs_dataset
       ]
