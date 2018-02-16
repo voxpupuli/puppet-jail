@@ -142,6 +142,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   end
 
   def set_property(property, value)
+      Puppet.debug "JailPyIocage(#set_property): #{property}=#{value}"
     iocage(['set', "#{property}=#{value}", resource[:name]])
   end
 
