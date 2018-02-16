@@ -218,6 +218,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   def flush
     options = []
     props = []
+
     if @property_flush
       Puppet.debug "JailPyIocage(#flush): #{@property_flush}"
       Puppet.debug "JailPyIocage(#hash): #{@property_hash}"
@@ -255,7 +256,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       pkgfile.delete if pkgfile
 
-      if resource[:state] == :up && resource[:ensure] == :present
+      if resource[:state] == :up && @property_hash[:ensure] == :present
         iocage(['start', resource[:name]])
         if resource[:user_data]
           tmpfile = Tempfile.new('puppet-iocage')
