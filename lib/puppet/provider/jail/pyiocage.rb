@@ -256,8 +256,15 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       pkgfile.delete if pkgfile
 
-      if resource[:state] == :up && @property_hash[:ensure] == :present
+      # When a jail has just been created, the @property_flush will only
+      # contain :ensure=>:present.  As such, when we have that in the property
+      # flush, and we desire the state to be up, then we must start it since we
+      # have just created it.
+      if resource[:state] == :up && @property_flush[:ensure] == :present
         iocage(['start', resource[:name]])
+
+        # Now that the jail has been started after initial creation, iwe need
+        # to handle the user_data for the new jail.
         if resource[:user_data]
           tmpfile = Tempfile.new('puppet-iocage')
           tmpfile.write(resource[:user_data])
