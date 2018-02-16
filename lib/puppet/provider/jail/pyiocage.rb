@@ -278,7 +278,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       [:ip4_addr, :ip6_addr].each do |family_addr|
         if @property_flush.keys.include? family_addr
           need_restart = true
-          set_property(family_addr.to_s, @property_flush[family_addr])
+          set_property(family_addr.to_s, '"' + @property_flush[family_addr] + '"')
         end
       end
 
