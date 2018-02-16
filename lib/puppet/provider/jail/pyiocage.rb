@@ -219,6 +219,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     props = []
     if @property_flush
       Puppet.debug "JailPyIocage(#flush): #{@property_flush}"
+      Puppet.debug "JailPyIocage(#hash): #{@property_hash}"
 
       # this will need cleanup after use!
       pkgfile = create_pkglist(resource[:pkglist]) if resource[:pkglist]
