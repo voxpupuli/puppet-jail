@@ -236,13 +236,13 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       props << resource[:properties].each { |k, v| [k, v].join('=') } if resource[:properties]
 
-      case resource[:ensure]
+      case @property_flush[:ensure]
       when :absent
         unless @property_hash[:ensure] != :present
           iocage(['destroy', '--force', resource[:name]])
         end
       when :present
-        unless @property_hash[:ensure] == :present
+        # unless @property_hash[:ensure] == :present
           iocage('create', options, "--name #{resource[:name]}", props)
           # else
           #   # if we got here, one or more options on an existing jail changed
@@ -251,7 +251,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
           #   rebuild(options, props) if !options.empty? && resource[:allow_rebuild]
           #   rebuild(options, props) if @property_flush[:template] && resource[:allow_rebuild]
           #   # other changes just need a restart, and are handled below
-        end
+        # end
       end
 
       pkgfile.delete if pkgfile
