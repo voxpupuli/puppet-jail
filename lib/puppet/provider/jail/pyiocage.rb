@@ -302,8 +302,13 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         end
       end
 
+      if @property_flush[:boot]
+        set_property('boot', @property_flush[:boot].to_s)
+      end
+
       restart if need_restart && @resource[:allow_restart] == :true
     end
+
     @property_hash = resource.to_hash
   end
 end
