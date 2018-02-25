@@ -111,6 +111,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     output = iocage('get', 'all', jailname)
     output.lines.each do |l|
       key, value = l.split(':', 2)
+
+      next if key == 'last_started'
+      next if key == 'jail_zfs_dataset'
+
       data[key] = value.chomp
     end
     data.reject! { |k, v| k.nil? || Fields.include?(k.to_sym) || v.nil? || v == jailname }
