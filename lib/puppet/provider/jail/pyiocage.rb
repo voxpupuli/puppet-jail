@@ -234,7 +234,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       props << "ip4_addr='#{resource[:ip4_addr]}'" if resource[:ip4_addr]
       props << "ip6_addr='#{resource[:ip6_addr]}'" if resource[:ip6_addr]
 
-      props << resource[:properties].each { |k, v| [k, v].join('=') } if resource[:properties]
+      resource[:properties].each { |k, v| props << [k, v].join('=') } if resource[:properties]
 
       case @property_flush[:ensure]
       when :absent
