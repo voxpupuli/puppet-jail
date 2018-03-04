@@ -273,7 +273,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
           tmpfile = Tempfile.new('puppet-iocage')
           tmpfile.write(resource[:user_data])
           tmpfile.close
-          iocage('exec', resource[:name], '/bin/sh', stdinfile: tmpfile.path)
+          execute("/usr/local/sbin/iocage exec #{resource[:name]} /bin/sh < #{tmpfile.path}")
           tmpfile.delete
         end
       end
