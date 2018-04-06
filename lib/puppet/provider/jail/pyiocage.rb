@@ -111,6 +111,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     output = iocage('get', 'all', jailname)
     output.lines.each do |l|
       key, value = l.split(':', 2)
+
+      next if key == 'last_started'
+      next if key == 'jail_zfs_dataset'
+
       data[key] = value.chomp
     end
     data.reject! { |k, v| k.nil? || Fields.include?(k.to_sym) || v.nil? || v == jailname }
@@ -142,6 +146,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   end
 
   def set_property(property, value)
+      Puppet.debug "JailPyIocage(#set_property): #{property}=#{value}"
     iocage(['set', "#{property}=#{value}", resource[:name]])
   end
 
@@ -217,8 +222,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   def flush
     options = []
     props = []
+
     if @property_flush
       Puppet.debug "JailPyIocage(#flush): #{@property_flush}"
+      Puppet.debug "JailPyIocage(#hash): #{@property_hash}"
 
       # this will need cleanup after use!
       pkgfile = create_pkglist(resource[:pkglist]) if resource[:pkglist]
@@ -231,15 +238,15 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       props << "ip4_addr='#{resource[:ip4_addr]}'" if resource[:ip4_addr]
       props << "ip6_addr='#{resource[:ip6_addr]}'" if resource[:ip6_addr]
 
-      props << resource[:properties].each { |k, v| [k, v].join('=') } if resource[:properties]
+      resource[:properties].each { |k, v| props << [k, v].join('=') } if resource[:properties]
 
-      case resource[:ensure]
+      case @property_flush[:ensure]
       when :absent
         unless @property_hash[:ensure] != :present
           iocage(['destroy', '--force', resource[:name]])
         end
       when :present
-        unless @property_hash[:ensure] == :present
+        # unless @property_hash[:ensure] == :present
           iocage('create', options, "--name #{resource[:name]}", props)
           # else
           #   # if we got here, one or more options on an existing jail changed
@@ -248,27 +255,34 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
           #   rebuild(options, props) if !options.empty? && resource[:allow_rebuild]
           #   rebuild(options, props) if @property_flush[:template] && resource[:allow_rebuild]
           #   # other changes just need a restart, and are handled below
-        end
+        # end
       end
 
       pkgfile.delete if pkgfile
 
-      if resource[:state] == :up && resource[:ensure] == :present
+      # When a jail has just been created, the @property_flush will only
+      # contain :ensure=>:present.  As such, when we have that in the property
+      # flush, and we desire the state to be up, then we must start it since we
+      # have just created it.
+      if resource[:state] == :up && @property_flush[:ensure] == :present
         iocage(['start', resource[:name]])
+
+        # Now that the jail has been started after initial creation, iwe need
+        # to handle the user_data for the new jail.
         if resource[:user_data]
           tmpfile = Tempfile.new('puppet-iocage')
           tmpfile.write(resource[:user_data])
           tmpfile.close
-          iocage('exec', resource[:name], '/bin/sh', stdinfile: tmpfile.path)
+          execute("/usr/local/bin/iocage exec #{resource[:name]} /bin/sh < #{tmpfile.path}")
           tmpfile.delete
         end
       end
 
       need_restart = false
-      [:ip4_addr, :ip6_addr].each do |p|
-        if @property_flush[p]
+      [:ip4_addr, :ip6_addr].each do |family_addr|
+        if @property_flush.keys.include? family_addr
           need_restart = true
-          set_property(p.to_s, @property_flush[p])
+          set_property(family_addr.to_s, '"' + @property_flush[family_addr] + '"')
         end
       end
 
@@ -288,8 +302,13 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         end
       end
 
+      if @property_flush[:boot]
+        set_property('boot', @property_flush[:boot].to_s)
+      end
+
       restart if need_restart && @resource[:allow_restart] == :true
     end
+
     @property_hash = resource.to_hash
   end
 end
