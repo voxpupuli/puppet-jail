@@ -7,7 +7,14 @@
   "source": "git://github.com/xaque208/puppet-jail.git",
   "project_page": "https://github.com/xaque208/puppet-jail",
   "issues_url": "https://github.com/xaque208/puppet-jail/issues",
-  "tags": ["FreeBSD", "jails", "containers", "iocage", "zfs"],
+  "tags": [
+    "FreeBSD",
+    "jails",
+    "containers",
+    "iocage",
+    "zfs"
+  ],
+  "data_provider": "hiera",
   "operatingsystem_support": [
     {
       "operatingsystem": "FreeBSD",
@@ -23,6 +30,9 @@
     }
   ],
   "dependencies": [
-    { "name": "puppetlabs/concat", "version_requirement": ">= 1.1.0 <= 5.0.0" }
+    {
+      "name": "puppetlabs/concat",
+      "version_requirement": ">= 1.1.0 <= 5.0.0"
+    }
   ]
 }
