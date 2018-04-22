@@ -11,8 +11,20 @@ This module expects to be the only jail manager on a given system.  Each system 
 ```Puppet
 include jail::setup
 ```
+This module supports `iocage` legacy, `py-iocage`, and `iocell`.
+To choose between them, pick one of the following:
 
-This simply installs 'iocage' and removes '/etc/jail.conf'.
+```Puppet
+include jail::iocage
+```
+```Puppet
+include jail::iocell
+```
+```Puppet
+include jail::py-iocage
+```
+
+This simply installs 'iocage', `py-iocage`, or `iocell`, and removes '/etc/jail.conf'.
 
 This allows the type to use the correct jail without having to
 specify the pool on each jail.
@@ -27,6 +39,11 @@ jail { 'myjail1':
   ip6_addr  => 'em0|fc00::10/64',
   hostname  => 'myjail1.example.com',
   boot      => 'on',
+  pcpu      => '20'
+  memoryuse => '4G',
+  quota     => '15G',
+  release   => '11.1-RELEASE'
+  rlimits   => 'on',
   user_data => template('mysite/user_data.sh.erb'),
 }
 ```

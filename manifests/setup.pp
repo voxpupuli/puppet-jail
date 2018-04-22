@@ -5,18 +5,17 @@
 #
 class jail::setup () {
 
-  package { 'iocage':
-    ensure => installed,
+  package { $jailmanager:
+    ensure  => latest,
+    require => File['/etc/jail.conf'],
   }
 
-  service { 'iocage':
-    enable => true,
+  service { $jailservice:
+    enable  => true,
+    require => [File['/etc/jail.conf'], Package[$jailmanager]],
   }
 
   file { '/etc/jail.conf':
     ensure => absent,
   }
-
-  File['/etc/jail.conf'] ~> Service['iocage']
-  Package['iocage'] ~> Service['iocage']
 }
