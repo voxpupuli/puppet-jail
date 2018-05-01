@@ -1,5 +1,11 @@
 ## Unreleased
 
+Modulesync for deployment updates
+Add design doc for where to keep the conversation about approach
+Replace iocage.sh provider with iocage.py provider
+Moved iocage.sh provider to iocage_legacy name
+Add new properties 
+
 ## 2016-08-29 3.1.0
 #### Summary
 Drop old puppet versions, add tests for existing functionality.
