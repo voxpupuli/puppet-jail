@@ -81,7 +81,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       ]
 
       all_properties = get_jail_properties(j[:uuid])
-      our_props = (all_properties - default_properties).to_h
+      our_props = (all_properties - default_properties).to_h.delete_if {|k| properties_to_skip.include?(k) }
+
       debug our_props
       jail_properties[:properties] = our_props.empty? ? nil : our_props
 
