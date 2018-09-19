@@ -76,8 +76,13 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         template: j[:template]
       }
 
+      properties_to_skip = [
+        :gitlocation
+      ]
+
       all_properties = get_jail_properties(j[:uuid])
       our_props = (all_properties - default_properties).to_h
+      debug our_props
       jail_properties[:properties] = our_props.empty? ? nil : our_props
 
       if j[:type] == 'jail'
