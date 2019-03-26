@@ -7,7 +7,7 @@ putting idempotency into consideration, it gets a bit trickier.
 In this document we'll consider how Create-Update-Delete works, and what it affects.
 
 The core of our design is that the `tag=` is unique (`namevar`). We must do
-anything to ensure that. 
+anything to ensure that.
 
 ## Create
 
