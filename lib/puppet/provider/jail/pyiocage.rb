@@ -119,6 +119,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     end
     data.reject! { |k, v| k.nil? || Fields.include?(k.to_sym) || v.nil? || v == jailname }
 
+    debug 'Data for get_jail_properties'
     debug data
 
     Set.new(data).freeze
@@ -288,7 +289,12 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       if @property_flush[:properties]
         # none of these need a restart
-        @property_flush[:properties].each { |p, v| set_property(p.to_s, v) }
+        keys_to_set = @property_flush[:properties].reject do |_p, _v|
+          @property_hash.keys.include?
+        end
+        keys_to_set.each do |x|
+          set_property(x.to_s, @property_flush[x]) if @property_hash[x] != @property_flush[x]
+        end
       end
 
       if @property_flush[:state]
