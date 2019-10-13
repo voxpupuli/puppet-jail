@@ -114,6 +114,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       next if key == 'last_started'
       next if key == 'jail_zfs_dataset'
+      next if key == 'devfs_ruleset'
 
       data[key] = value.chomp
     end
