@@ -289,8 +289,8 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
       if @property_flush[:properties]
         # none of these need a restart
-        keys_to_set = @property_flush[:properties].reject do |_p, _v|
-          @property_hash.keys.include?
+        keys_to_set = @property_flush[:properties].select do |p, _v|
+          @property_hash.keys.include? p
         end
         keys_to_set.each do |x|
           set_property(x.to_s, @property_flush[x]) if @property_hash[x] != @property_flush[x]
