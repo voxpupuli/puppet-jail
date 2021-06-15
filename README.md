@@ -1,6 +1,11 @@
 # FreeBSD Jail management with Puppet
 
-[![Puppet Forge](https://img.shields.io/puppetforge/v/zleslie/jail.svg)]() [![Build Status](https://travis-ci.org/xaque208/puppet-jail.svg?branch=master)](https://travis-ci.org/xaque208/puppet-jail)
+[![CI](https://github.com/voxpupuli/puppet-jail/actions/workflows/ci.yml/badge.svg)](https://github.com/voxpupuli/puppet-jail/actions/workflows/ci.yml)
+[![Puppet Forge](https://img.shields.io/puppetforge/v/puppet/jail.svg)](https://forge.puppetlabs.com/puppet/jail)
+[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/puppet/jail.svg)](https://forge.puppetlabs.com/puppet/jail)
+[![Puppet Forge - endorsement](https://img.shields.io/puppetforge/e/puppet/jail.svg)](https://forge.puppetlabs.com/puppet/jail)
+[![Puppet Forge - scores](https://img.shields.io/puppetforge/f/puppet/jail.svg)](https://forge.puppetlabs.com/puppet/jail)
+[![Apache-2 License](https://img.shields.io/github/license/voxpupuli/puppet-jail.svg)](LICENSE)
 
 Manage FreeBSD jails with Puppet, leveraging [iocage] for jail management.
 

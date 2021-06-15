@@ -1,12 +1,12 @@
 {
-  "name": "zleslie-jail",
+  "name": "puppet-jail",
   "version": "4.0.1",
-  "author": "zleslie",
+  "author": "Vox Pupli",
   "summary": "Jail management with Puppet",
   "license": "Apache-2.0",
-  "source": "git://github.com/xaque208/puppet-jail.git",
-  "project_page": "https://github.com/xaque208/puppet-jail",
-  "issues_url": "https://github.com/xaque208/puppet-jail/issues",
+  "source": "git://github.com/voxpupuli/puppet-jail.git",
+  "project_page": "https://github.com/voxpupuli/puppet-jail",
+  "issues_url": "https://github.com/voxpupuli/puppet-jail/issues",
   "tags": [
     "FreeBSD",
     "jails",
