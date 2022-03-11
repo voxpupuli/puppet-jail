@@ -1,38 +1,40 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'puppet/type/jail'
 
 type_class = Puppet::Type.type(:jail)
 
 describe type_class do
-  [:absent, :present].each do |v|
-    it "should support #{v} as a value to :ensure" do
+  %i[absent present].each do |v|
+    it "supports #{v} as a value to :ensure" do
       j = type_class.new(name: 'myjail', ensure: v, release: '0.1-TESTING')
       expect(j.should(:ensure)).to eq(v)
     end
   end
 
   let :params do
-    [
-      :name,
-      :user_data,
-      :pkglist,
-      :allow_rebuild,
-      :allow_restart
+    %i[
+      name
+      user_data
+      pkglist
+      allow_rebuild
+      allow_restart
     ]
   end
 
   let :properties do
-    [
-      :jid,
-      :ensure,
-      :boot,
-      :state,
-      :ip4_addr,
-      :ip6_addr,
-      :type,
-      :template,
-      :fstab,
-      :properties
+    %i[
+      jid
+      ensure
+      boot
+      state
+      ip4_addr
+      ip6_addr
+      type
+      template
+      fstab
+      properties
     ]
   end
 

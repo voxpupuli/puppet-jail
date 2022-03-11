@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tempfile'
 
 Puppet::Type.type(:jail).provide(:pyiocage) do
@@ -19,7 +21,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
 
   mk_resource_methods
 
-  Fields = [
+  Fields = [ # rubocop:disable Lint/ConstantDefinitionInBlock,Naming/ConstantName
     :jid,
     :uuid,
     :boot,
@@ -42,7 +44,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       jail_data = {}
       values = j.split(%r{\s+})
       values.each_index do |i|
-        jail_data[Fields[i]] = values[i] != '-' ? values[i] : nil
+        jail_data[Fields[i]] = values[i] == '-' ? nil : values[i]
       end
       data << jail_data
     end
@@ -210,6 +212,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   # users of this function should take care that it's deleted!
   def create_pkglist(pkglist)
     return nil if pkglist.nil? || pkglist.empty?
+
     pkgfile = Tempfile.new('puppet-iocage.pkglist')
     pkgfile.write({ pkgs: pkglist }.to_json)
     pkgfile.close
@@ -240,13 +243,11 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       props << "ip4_addr='#{resource[:ip4_addr]}'" if resource[:ip4_addr]
       props << "ip6_addr='#{resource[:ip6_addr]}'" if resource[:ip6_addr]
 
-      resource[:properties].each { |k, v| props << [k, v].join('=') } if resource[:properties]
+      resource[:properties]&.each { |k, v| props << [k, v].join('=') }
 
       case @property_flush[:ensure]
       when :absent
-        unless @property_hash[:ensure] != :present
-          iocage(['destroy', '--force', resource[:name]])
-        end
+        iocage(['destroy', '--force', resource[:name]]) unless @property_hash[:ensure] != :present
       when :present
         # unless @property_hash[:ensure] == :present
         iocage('create', options, "--name #{resource[:name]}", props)
@@ -260,7 +261,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         # end
       end
 
-      pkgfile.delete if pkgfile
+      pkgfile&.delete
 
       # When a jail has just been created, the @property_flush will only
       # contain :ensure=>:present.  As such, when we have that in the property
@@ -281,10 +282,10 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       end
 
       need_restart = false
-      [:ip4_addr, :ip6_addr].each do |family_addr|
+      %i[ip4_addr ip6_addr].each do |family_addr|
         if @property_flush.keys.include? family_addr
           need_restart = true
-          set_property(family_addr.to_s, '"' + @property_flush[family_addr] + '"')
+          set_property(family_addr.to_s, "\"#{@property_flush[family_addr]}\"")
         end
       end
 
@@ -309,9 +310,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         end
       end
 
-      if @property_flush[:boot]
-        set_property('boot', @property_flush[:boot].to_s)
-      end
+      set_property('boot', @property_flush[:boot].to_s) if @property_flush[:boot]
 
       restart if need_restart && @resource[:allow_restart] == :true
     end

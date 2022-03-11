@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'puppet/provider/jail/iocage_legacy'
 
 provider_class = Puppet::Type.type(:jail).provider(:iocage_legacy)
 
 describe provider_class do
-  context '#jail_list' do
+  describe '#jail_list' do
     it 'parses jail listing' do
       fixture = File.read('spec/fixtures/iocage_list')
       # provider_class.stub(:iocage).with(['list']) { fixture }
@@ -14,7 +16,7 @@ describe provider_class do
     end
   end
 
-  context '#jail_list-t' do
+  describe '#jail_list-t' do
     it 'parses jail listing' do
       fixture = File.read('spec/fixtures/iocage_list-t')
       allow(provider_class).to receive(:iocage).with(['list']) { fixture }
@@ -23,21 +25,21 @@ describe provider_class do
     end
   end
 
-  context '#get_jail_properties-t' do
+  describe '#get_jail_properties-t' do
     it 'parses jail properties' do
       list_fixture = File.read('spec/fixtures/iocage_list-t')
       allow(provider_class).to receive(:iocage).with(['list']) { list_fixture }
 
       get_fixture = File.read('spec/fixtures/iocage_jail_get_all-t')
-      allow(provider_class).to receive(:iocage).with(['get', 'all', 'b439bd7a-5376-11e7-ad91-d979c2a3eb55']) { get_fixture }
+      allow(provider_class).to receive(:iocage).with(%w[get all b439bd7a-5376-11e7-ad91-d979c2a3eb55]) { get_fixture }
 
       results = provider_class.get_jail_properties('b439bd7a-5376-11e7-ad91-d979c2a3eb55')
 
       expect(results).to(include(
-                           'tag'      => 'f11-puppet4',
-                           'boot'     => 'off',
+                           'tag' => 'f11-puppet4',
+                           'boot' => 'off',
                            'template' => 'yes'
-      ))
+                         ))
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This type is meant to facilitate the deployment of FreeBSD jails.
 #
 
@@ -54,7 +56,7 @@ Puppet::Type.newtype(:jail) do
     # fetch expects it *without* the patch level.
     #
     # this is how we deal with that:
-    def insync?(is)
+    def insync?(is) # rubocop:disable Naming/MethodParameterName
       should = @should.is_a?(Array) ? @should.first : @should
       is.start_with?(should)
     end
@@ -128,7 +130,7 @@ Puppet::Type.newtype(:jail) do
 
   newparam(:pkglist, array_matching: :all) do
     desc 'A list of packages to be installed in this jail before startup'
-    def insync?(is)
+    def insync?(is) # rubocop:disable Naming/MethodParameterName
       Array(is).sort == Array(@shouldA).sort
     end
   end
@@ -156,12 +158,12 @@ Puppet::Type.newtype(:jail) do
 
   # `jail { x: release => foo }` should depend on jail_release { foo: }
   autorequire(:jail_release) do
-    self[:release] if self[:release]
+    self[:release]
   end
 
   # `jail { x: template => foo }` should depend on jail { foo: template => yes }
   autorequire(:jail) do
-    self[:template] if self[:template]
+    self[:template]
   end
 
   def refresh

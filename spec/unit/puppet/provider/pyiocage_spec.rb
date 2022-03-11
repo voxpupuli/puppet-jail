@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'puppet/provider/jail/pyiocage'
 
@@ -7,7 +9,7 @@ cmd = '/usr/local/bin/iocage'
 exec_props = { override_locale: false, failonfail: true, combine: true }
 
 describe provider_class do
-  context '#jail_list' do
+  describe '#jail_list' do
     before do
       fixture_jails  = File.read('spec/fixtures/pyiocage_list-l')
       fixture_tmpl   = File.read('spec/fixtures/pyiocage_list-t')
@@ -76,7 +78,7 @@ describe provider_class do
     end
   end
 
-  context '#get_jail_properties' do
+  describe '#get_jail_properties' do
     before do
       list_fixture = File.read('spec/fixtures/pyiocage_list')
       allow(provider_class).to receive(cmd).with(['list']) { list_fixture }
@@ -91,39 +93,41 @@ describe provider_class do
       expect(results).to(include(
                            'openfiles' => 'off',
                            'memoryuse' => '8G:log'
-      ))
+                         ))
     end
   end
 
-  context '#empty jail_list' do
+  describe '#empty jail_list' do
     before do
       provider_class.stub(:iocage).with('list', '-Htl') { '' }
       provider_class.stub(:iocage).with('list', '-Hl') { '' }
     end
+
     it 'parses empty output an empty hash' do
       expect(provider_class.jail_list).to eq([])
     end
   end
 
-  context '#fstab' do
+  describe '#fstab' do
     before do
       provider_class.stub(:iocage).with('fstab', '-Hl', 'cyhr') do
-        <<-EOT
-0       /usr/local/etc/puppet /iocage/jails/cyhr/root/usr/local/etc/puppet nullfs ro 0 0
-1       /data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0
-      EOT
+        <<~EOT
+          0       /usr/local/etc/puppet /iocage/jails/cyhr/root/usr/local/etc/puppet nullfs ro 0 0
+          1       /data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0
+        EOT
       end
       provider_class.stub(:iocage).with('list', '-Htl') { '' }
       provider_class.stub(:iocage).with('list', '-Hl') do
-        <<-EOT
-19      cyhr    off     up      jail    11.0-RELEASE-p10        vtnet0|172.16.1.3/12    -       f11-php71
-      EOT
+        <<~EOT
+          19      cyhr    off     up      jail    11.0-RELEASE-p10        vtnet0|172.16.1.3/12    -       f11-php71
+        EOT
       end
 
       # we don't care about properties
       provider_class.stub(:iocage).with('get', 'all', 'default') { '' }
       provider_class.stub(:iocage).with('get', 'all', 'cyhr') { '' }
     end
+
     it 'parses fstab entries' do
       expect(provider_class.instances[0].fstab).to eq(['/usr/local/etc/puppet', '/data/www/cyhr /iocage/jails/cyhr/root/usr/local/www nullfs ro 0 0'])
     end

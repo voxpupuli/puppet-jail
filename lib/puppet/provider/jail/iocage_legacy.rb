@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tempfile'
 
 Puppet::Type.type(:jail).provide(:iocage_legacy) do
@@ -55,17 +57,17 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
 
       jail_properties[:jid] = j[:jid] if j[:jid] != '-'
 
-      extra_properties = [
-        :ip4_addr,
-        :ip6_addr,
-        :hostname,
-        :pcpu,
-        :memoryuse,
-        :quota,
-        :release,
-        :rlimits,
-        :jail_zfs,
-        :jail_zfs_dataset
+      extra_properties = %i[
+        ip4_addr
+        ip6_addr
+        hostname
+        pcpu
+        memoryuse
+        quota
+        release
+        rlimits
+        jail_zfs
+        jail_zfs_dataset
       ]
 
       extra_properties.each do |p|
@@ -174,18 +176,18 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
     if @property_flush
       Puppet.debug "JailIocage(#flush): #{@property_flush}"
 
-      pre_start_properties = [
-        :boot,
-        :ip4_addr,
-        :ip6_addr,
-        :hostname,
-        :pcpu,
-        :memoryuse,
-        :quota,
-        :release,
-        :rlimits,
-        :jail_zfs,
-        :jail_zfs_dataset
+      pre_start_properties = %i[
+        boot
+        ip4_addr
+        ip6_addr
+        hostname
+        pcpu
+        memoryuse
+        quota
+        release
+        rlimits
+        jail_zfs
+        jail_zfs_dataset
       ]
 
       unless resource[:pkglist].empty?
