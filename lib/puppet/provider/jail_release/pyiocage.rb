@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::Type.type(:jail_release).provide(:pyiocage) do
   desc 'Manage jails release base downloads using iocage(8)'
   confine    kernel: :freebsd

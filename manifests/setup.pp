@@ -1,10 +1,9 @@
-# Class: jail::setup
 #
-# Lay down the global configuration for jail.conf as well as create the needed
-# directories and/or zfs mountpoints.
+# @summary Lay down the global configuration for jail.conf as well as create the needed directories and/or zfs mountpoints.
+# @param package_name name of the package that provides iocage
 #
 class jail::setup (
-  $package_name = 'py36-iocage'
+  String[1] $package_name = 'py36-iocage'
 ) {
   package { 'iocage':
     ensure => installed,

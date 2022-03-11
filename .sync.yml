@@ -4,3 +4,8 @@ Gemfile:
     ':testextra':
       - gem: 'rspec-mocks'
       - gem: 'rspec-expectations'
+
+.puppet-lint.rc:
+  enabled_lint_checks:
+    - parameter_documentation
+    - parameter_types
