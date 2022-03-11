@@ -1,6 +1,6 @@
 {
   "name": "puppet-jail",
-  "version": "5.0.1-rc0",
+  "version": "5.0.1",
   "author": "Vox Pupli",
   "summary": "Jail management with Puppet",
   "license": "Apache-2.0",
