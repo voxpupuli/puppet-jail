@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v5.0.1](https://github.com/voxpupuli/puppet-jail/tree/v5.0.1) (2022-03-11)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-jail/compare/v5.0.0...v5.0.1)
+
+**Breaking changes:**
+
+- Drop support for FreeBSD 10, 11 \(EOL\) [\#62](https://github.com/voxpupuli/puppet-jail/pull/62) ([smortex](https://github.com/smortex))
+
+**Merged pull requests:**
+
+- puppetlabs/concat: Fix version range in metadata.json [\#65](https://github.com/voxpupuli/puppet-jail/pull/65) ([bastelfreak](https://github.com/bastelfreak))
+- cleanup old hiera-in-modules setup [\#64](https://github.com/voxpupuli/puppet-jail/pull/64) ([bastelfreak](https://github.com/bastelfreak))
+- modulesync 5.2.0 / package\_name: Add `String[1]` datatype [\#63](https://github.com/voxpupuli/puppet-jail/pull/63) ([bastelfreak](https://github.com/bastelfreak))
+
 ## [v5.0.0](https://github.com/voxpupuli/puppet-jail/tree/v5.0.0) (2021-06-15)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-jail/compare/4.0.1...v5.0.0)
