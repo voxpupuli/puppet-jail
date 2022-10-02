@@ -56,7 +56,7 @@ Puppet::Type.newtype(:jail) do
     # fetch expects it *without* the patch level.
     #
     # this is how we deal with that:
-    def insync?(is) # rubocop:disable Naming/MethodParameterName
+    def insync?(is)
       should = @should.is_a?(Array) ? @should.first : @should
       is.start_with?(should)
     end
@@ -130,7 +130,7 @@ Puppet::Type.newtype(:jail) do
 
   newparam(:pkglist, array_matching: :all) do
     desc 'A list of packages to be installed in this jail before startup'
-    def insync?(is) # rubocop:disable Naming/MethodParameterName
+    def insync?(is)
       Array(is).sort == Array(@shouldA).sort
     end
   end
