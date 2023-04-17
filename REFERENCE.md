@@ -6,7 +6,7 @@
 
 ### Classes
 
-* [`jail::setup`](#jailsetup): Lay down the global configuration for jail.conf as well as create the needed directories and/or zfs mountpoints.
+* [`jail::setup`](#jail--setup): Lay down the global configuration for jail.conf as well as create the needed directories and/or zfs mountpoints.
 
 ### Resource types
 
@@ -15,7 +15,7 @@
 
 ## Classes
 
-### <a name="jailsetup"></a>`jail::setup`
+### <a name="jail--setup"></a>`jail::setup`
 
 Lay down the global configuration for jail.conf as well as create the needed directories and/or zfs mountpoints.
 
@@ -23,9 +23,9 @@ Lay down the global configuration for jail.conf as well as create the needed dir
 
 The following parameters are available in the `jail::setup` class:
 
-* [`package_name`](#package_name)
+* [`package_name`](#-jail--setup--package_name)
 
-##### <a name="package_name"></a>`package_name`
+##### <a name="-jail--setup--package_name"></a>`package_name`
 
 Data type: `String[1]`
 
@@ -141,30 +141,30 @@ Default value: `jail`
 
 The following parameters are available in the `jail` type.
 
-* [`allow_rebuild`](#allow_rebuild)
-* [`allow_restart`](#allow_restart)
-* [`name`](#name)
-* [`pkglist`](#pkglist)
-* [`provider`](#provider)
-* [`user_data`](#user_data)
+* [`allow_rebuild`](#-jail--allow_rebuild)
+* [`allow_restart`](#-jail--allow_restart)
+* [`name`](#-jail--name)
+* [`pkglist`](#-jail--pkglist)
+* [`provider`](#-jail--provider)
+* [`user_data`](#-jail--user_data)
 
-##### <a name="allow_rebuild"></a>`allow_rebuild`
+##### <a name="-jail--allow_rebuild"></a>`allow_rebuild`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Allow destroying! and rebuilding of this jail
 
-Default value: ``true``
+Default value: `true`
 
-##### <a name="allow_restart"></a>`allow_restart`
+##### <a name="-jail--allow_restart"></a>`allow_restart`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Allow restarting of this jail
 
-Default value: ``true``
+Default value: `true`
 
-##### <a name="name"></a>`name`
+##### <a name="-jail--name"></a>`name`
 
 Valid values: `%r{^[a-zA-Z0-9_-]+$}`
 
@@ -172,16 +172,16 @@ namevar
 
 The name (and hostname) of the jail
 
-##### <a name="pkglist"></a>`pkglist`
+##### <a name="-jail--pkglist"></a>`pkglist`
 
 A list of packages to be installed in this jail before startup
 
-##### <a name="provider"></a>`provider`
+##### <a name="-jail--provider"></a>`provider`
 
 The specific backend to use for this `jail` resource. You will seldom need to specify this --- Puppet will usually
 discover the appropriate provider for your platform.
 
-##### <a name="user_data"></a>`user_data`
+##### <a name="-jail--user_data"></a>`user_data`
 
 Rendered content to pipe to a jailed shell upon creation
 
@@ -207,16 +207,16 @@ Default value: `present`
 
 The following parameters are available in the `jail_release` type.
 
-* [`name`](#name)
-* [`provider`](#provider)
+* [`name`](#-jail_release--name)
+* [`provider`](#-jail_release--provider)
 
-##### <a name="name"></a>`name`
+##### <a name="-jail_release--name"></a>`name`
 
 namevar
 
 The release to fetch
 
-##### <a name="provider"></a>`provider`
+##### <a name="-jail_release--provider"></a>`provider`
 
 The specific backend to use for this `jail_release` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
