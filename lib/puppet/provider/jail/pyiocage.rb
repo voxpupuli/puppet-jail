@@ -31,7 +31,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
     :ip4_addr,
     :ip6_addr,
     :template,
-    :cloned_release # cheat to filter out cloned_release from `properties`
+    :cloned_release, # cheat to filter out cloned_release from `properties`
   ].freeze
 
   def self.jail_list
@@ -44,7 +44,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
       jail_data = {}
       values = j.split(%r{\s+})
       values.each_index do |i|
-        jail_data[Fields[i]] = values[i] == '-' ? nil : values[i]
+        jail_data[Fields[i]] = (values[i] == '-') ? nil : values[i]
       end
       data << jail_data
     end
@@ -75,7 +75,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
         release: j[:release],
         ip4_addr: j[:ip4_addr],
         ip6_addr: j[:ip6_addr],
-        template: j[:template]
+        template: j[:template],
       }
 
       all_properties = get_jail_properties(j[:uuid])
@@ -102,7 +102,7 @@ Puppet::Type.type(:jail).provide(:pyiocage) do
   end
 
   def initialize(value = {})
-    super(value)
+    super
     @property_flush = {}
   end
 

@@ -27,7 +27,7 @@ describe provider_class do
                   release: '11.0-RELEASE-p10',
                   ip4_addr: 'vtnet0|172.16.0.6/12',
                   ip6_addr: nil,
-                  template: nil },
+                  template: nil, },
                 { jid: nil,
                   uuid: 'f11-php71',
                   boot: 'off',
@@ -36,7 +36,7 @@ describe provider_class do
                   release: '11.0-RELEASE-p10',
                   ip4_addr: 'vtnet0|172.16.0.4/12',
                   ip6_addr: nil,
-                  template: nil },
+                  template: nil, },
                 { jid: nil,
                   uuid: 'f11-puppet4',
                   boot: 'off',
@@ -45,7 +45,7 @@ describe provider_class do
                   release: '11.0-RELEASE-p10',
                   ip4_addr: nil,
                   ip6_addr: nil,
-                  template: nil },
+                  template: nil, },
                 { jid: '9',
                   uuid: 'blag',
                   boot: 'off',
@@ -54,7 +54,7 @@ describe provider_class do
                   release: '11.0-RELEASE-p10',
                   ip4_addr: 'vtnet0|172.16.0.5/12',
                   ip6_addr: nil,
-                  template: 'f11-php71' },
+                  template: 'f11-php71', },
                 { jid: nil,
                   uuid: 'cdn',
                   boot: 'off',
@@ -63,7 +63,7 @@ describe provider_class do
                   release: '11.0-RELEASE-p10',
                   ip4_addr: 'vtnet0|172.16.0.7/12',
                   ip6_addr: 'vtnet0|2a03:b0c0:3:d0::4c97:6007',
-                  template: 'f11-ats6' },
+                  template: 'f11-ats6', },
                 { jid: nil,
                   uuid: 'cdn01',
                   boot: 'off',
@@ -72,7 +72,7 @@ describe provider_class do
                   release: '11.0-RELEASE-p10',
                   ip4_addr: 'vtnet0|172.16.0.8/12',
                   ip6_addr: 'vtnet0|2a03:b0c0:3:d0::4c97:6008',
-                  template: 'f11-ats6' }]
+                  template: 'f11-ats6', },]
 
       expect(provider_class.jail_list).to eq(wanted)
     end
@@ -92,7 +92,7 @@ describe provider_class do
 
       expect(results).to(include(
                            'openfiles' => 'off',
-                           'memoryuse' => '8G:log'
+                           'memoryuse' => '8G:log',
                          ))
     end
   end

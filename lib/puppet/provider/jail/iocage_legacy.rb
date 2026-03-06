@@ -45,14 +45,14 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
     [jail_list, jail_list('-t')].each.map do |j|
       all_properties = get_jail_properties(j[:tag])
 
-      jensure = all_properties['template'] == 'yes' ? :template : :present
+      jensure = (all_properties['template'] == 'yes') ? :template : :present
 
       jail_properties = {
         provider: :iocage_legacy,
         ensure: jensure,
         name: j[:tag],
         state: j[:state],
-        boot: j[:boot]
+        boot: j[:boot],
       }
 
       jail_properties[:jid] = j[:jid] if j[:jid] != '-'
@@ -81,7 +81,7 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
   end
 
   def initialize(value = {})
-    super(value)
+    super
     @property_flush = {}
   end
 
@@ -100,7 +100,7 @@ Puppet::Type.type(:jail).provide(:iocage_legacy) do
   end
 
   def exists?
-    @property_hash[:ensure] == :present || @property_hash[:ensure] == :template
+    %i[present template].include?(@property_hash[:ensure])
   end
 
   def running?
