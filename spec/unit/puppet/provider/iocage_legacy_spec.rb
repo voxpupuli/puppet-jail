@@ -38,7 +38,7 @@ describe provider_class do
       expect(results).to(include(
                            'tag' => 'f11-puppet4',
                            'boot' => 'off',
-                           'template' => 'yes'
+                           'template' => 'yes',
                          ))
     end
   end
