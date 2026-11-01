@@ -220,4 +220,3 @@ The release to fetch
 
 The specific backend to use for this `jail_release` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
-
